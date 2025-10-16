@@ -212,6 +212,31 @@ const ActorDetails = () => {
     return <div>Loading...</div>;
   }
 
+  const getAge = (dob, deathday = null) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const endDate = deathday ? new Date(deathday) : new Date();
+
+    let age = endDate.getFullYear() - birthDate.getFullYear();
+    if (
+      endDate.getMonth() < birthDate.getMonth() ||
+      (endDate.getMonth() === birthDate.getMonth() &&
+        endDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(new Date(dateString));
+  };
+
   console.log(actorData);
 
   return (
@@ -329,21 +354,46 @@ const ActorDetails = () => {
             <div className="col-8 col-sm-12">
               <div className="text-holder">
                 <p>
+                  {actorData.actorDetails.birthday &&
+                    !actorData.actorDetails.deathday && (
+                      <>
+                        Born: {formatDate(actorData.actorDetails.birthday)}
+                        <br></br>({getAge(actorData.actorDetails.birthday)}{' '}
+                        years old)
+                      </>
+                    )}
+
+                  {actorData.actorDetails.birthday &&
+                    actorData.actorDetails.deathday && (
+                      <>
+                        Born: {formatDate(actorData.actorDetails.birthday)}{' '}
+                        <br></br>
+                        Died: {formatDate(actorData.actorDetails.deathday)}
+                        <br></br>(
+                        {getAge(
+                          actorData.actorDetails.birthday,
+                          actorData.actorDetails.deathday
+                        )}{' '}
+                        years old)
+                      </>
+                    )}
+                </p>
+                <p>
                   {actorData.actorDetails.biography &&
                     isSmallScreen === false &&
                     (showFullBiography
-                      ? actorData.actorDetails.biography // Show full biography if toggled
+                      ? actorData.actorDetails.biography
                       : actorData.actorDetails.biography.length > 1000
                       ? actorData.actorDetails.biography.substring(0, 1000) +
-                        '...' // Show truncated biography
+                        '...'
                       : actorData.actorDetails.biography)}
                   {actorData.actorDetails.biography &&
                     isSmallScreen &&
                     (showFullBiography
-                      ? actorData.actorDetails.biography // Show full biography if toggled
+                      ? actorData.actorDetails.biography
                       : actorData.actorDetails.biography.length > 140
                       ? actorData.actorDetails.biography.substring(0, 140) +
-                        '...' // Show truncated biography
+                        '...'
                       : actorData.actorDetails.biography)}
                   {actorData.actorDetails.biography &&
                     actorData.actorDetails.biography.length > 1000 &&
