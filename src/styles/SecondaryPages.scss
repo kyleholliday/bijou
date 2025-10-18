@@ -1,6 +1,7 @@
 .full-list {
   position: relative;
   z-index: 3;
+  padding-top: 40px;
 
   @media(max-width: 767px) {
     margin-top: 40px;

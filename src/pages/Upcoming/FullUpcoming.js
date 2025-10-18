@@ -38,6 +38,8 @@ const UpcomingMoviesPage = () => {
     return 'Release TBD';
   };
 
+  console.log(movies);
+
   return (
     <div className="container">
       <div className="full-list">

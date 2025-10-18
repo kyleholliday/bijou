@@ -28,7 +28,6 @@ const Navbar = () => {
 
   return (
     <>
-      <div className="top-navbar-shadow"></div>
       <nav className="navbar navbar-expand-md">
         <div className="container">
           <h1>

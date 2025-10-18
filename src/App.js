@@ -18,6 +18,8 @@ import Footer from './components/Footer';
 import './styles/Variables.scss';
 // import TopGenres from './pages/Home/Genres';
 
+document.title = 'Bijou';
+
 function App() {
   return (
     <div className="App">
