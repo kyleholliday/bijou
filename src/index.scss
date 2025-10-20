@@ -131,17 +131,10 @@ body {
   margin-top: 20px;
 
   .heading {
-    color: var(--main-yellow);
+    color: #FFFFFF;
     display: inline-block;
-    margin: 0;
-    background: #14181C;
-    padding: 10px 16px;
-    position: relative;
-    top: 20px;
-    z-index: 2;
-    left: -30px;
-    border-radius: 4px;
-    border: 2px solid var(--main-yellow);
+    margin: 0 0 10px;
+    font-weight: bold;
 
     @media(max-width:767px) {
       top: 0;
@@ -179,11 +172,14 @@ a.see-more {
 .movie-list .movie {
   flex-basis: calc(16.6667% - 12px);
   margin-bottom: 12px;
-  transition: transform 0.3s ease;
   position: relative;
   overflow: hidden;
   border-radius: 4px;
-  border: 2px solid rgb(255 255 255 / 21%);
+  border: 2px solid rgb(255 255 255 / 20%);
+
+  &:hover {
+    border: 2px solid #4A9EFF;
+  }
 
   @media(max-width: 767px) {
     flex-basis: calc(33.3% - 12px);
@@ -201,7 +197,8 @@ a.see-more {
     height: 100%;
     min-height: 100%;
     background: rgb(0 0 0 / 77%);
-    /* Transparent black overlay */
+
+    /* Transparent overlay */
     opacity: 0;
     display: flex;
     flex-direction: column;
@@ -232,8 +229,6 @@ a.see-more {
 
   @media(min-width: 768px) {
     &:hover {
-      transform: translateY(-10px);
-
       .overlay {
         opacity: 1;
       }

@@ -8,7 +8,6 @@ const NowPlayingMoviesPage = () => {
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
     const endpoint = `https://api.themoviedb.org/3/movie/now_playing`;
-    window.scrollTo(0, 0);
 
     axios
       .get(endpoint, {

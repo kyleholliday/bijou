@@ -17,6 +17,7 @@ const NowPlayingMovies = () => {
           api_key: apiKey,
           language: 'en-US',
           region: 'US',
+          page: 1,
         },
       })
       .then((response) => {

@@ -8,7 +8,6 @@ const TVTrendingPage = () => {
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
     const endpoint = `https://api.themoviedb.org/3/trending/tv/week`;
-    window.scrollTo(0, 0);
 
     axios
       .get(endpoint, {

@@ -1,22 +1,20 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/Navbar.scss';
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleSearch = () => {
     if (searchTerm.trim() !== '') {
-      // Navigate to the search results page with the search query
       navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
-      // Hide the navbar by changing the aria-expanded attribute
-      const navbarToggler = document.querySelector('.navbar-toggler');
-      const navbar = document.querySelector('.navbar-collapse');
-      if (navbarToggler) {
-        navbarToggler.ariaExpanded = false;
-        navbar.classList.remove('show');
-      }
+      setSearchOpen(false);
+      setSearchTerm('');
+      setMobileMenuOpen(false);
     }
   };
 
@@ -24,99 +22,212 @@ const Navbar = () => {
     if (e.key === 'Enter') {
       handleSearch();
     }
+    if (e.key === 'Escape') {
+      setSearchOpen(false);
+      setSearchTerm('');
+    }
+  };
+
+  const toggleSearch = () => {
+    setSearchOpen(!searchOpen);
+    if (!searchOpen) {
+      // Focus input when opening
+      setTimeout(() => {
+        document.getElementById('search-input')?.focus();
+      }, 100);
+    }
+  };
+
+  const handleNavClick = () => {
+    setMobileMenuOpen(false);
   };
 
   return (
-    <>
-      <nav className="navbar navbar-expand-md">
-        <div className="container">
-          <h1>
-            <a href="/" className="navbar-brand">
-              BIJOU
-            </a>
-          </h1>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarTogglerMain"
-            aria-controls="navbarTogglerMain"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarTogglerMain">
-            <ul className="navbar-nav nav-underline me-auto mb-2 mb-lg-0">
-              <li className="nav-item home">
-                <NavLink className="navlinks" to="/">
-                  Home
-                </NavLink>
-              </li>
-              <li className="nav-item d-flex d-sm-none">
-                <NavLink
-                  className="navlinks"
-                  to="/now-playing"
-                  data-toggle="collapse"
-                  data-target="#navbarTogglerMain"
-                >
-                  Now Playing
-                </NavLink>
-              </li>
-              <li className="nav-item d-none d-sm-block">
-                <NavLink className="navlinks" to="/now-playing">
-                  Now Playing
-                </NavLink>
-              </li>
-              <li className="nav-item d-flex d-sm-none">
-                <NavLink
-                  className="navlinks"
-                  to="/upcoming"
-                  data-toggle="collapse"
-                  data-target="#navbarTogglerMain"
-                >
-                  Upcoming
-                </NavLink>
-              </li>
-              <li className="nav-item d-none d-sm-block">
-                <NavLink className="navlinks" to="/upcoming">
-                  Upcoming
-                </NavLink>
-              </li>
-              <li className="nav-item d-flex d-sm-none">
-                <NavLink
-                  className="navlinks"
-                  to="/tv-trending"
-                  data-toggle="collapse"
-                  data-target="#navbarTogglerMain"
-                >
-                  Trending TV
-                </NavLink>
-              </li>
-              <li className="nav-item d-none d-sm-block">
-                <NavLink className="navlinks" to="/tv-trending">
-                  Trending TV
-                </NavLink>
-              </li>
-            </ul>
-            <div className="search-holder">
-              <input
-                type="text"
-                placeholder="Search Movies and TV"
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="form-control me-2"
-                aria-label="Search Movies and TV"
-                name="Search"
-              />
-              <button className="btn search-btn" onClick={handleSearch}>
-                Search
-              </button>
-            </div>
-          </div>
+    <nav className="modern-navbar">
+      <div className="navbar-container">
+        {/* Logo */}
+        <NavLink to="/" className="navbar-logo">
+          BIJOU
+        </NavLink>
+
+        {/* Desktop Navigation */}
+        <div className="navbar-links desktop">
+          {/* <NavLink to="/" className="navigation-link" end>
+            Home
+          </NavLink> */}
+          <NavLink to="/now-playing" className="navigation-link">
+            Now Playing
+          </NavLink>
+          <NavLink to="/upcoming" className="navigation-link">
+            Upcoming
+          </NavLink>
+          <NavLink to="/tv-trending" className="navigation-link">
+            Trending TV
+          </NavLink>
         </div>
-      </nav>
-    </>
+
+        {/* Desktop Search */}
+        <div className="navbar-actions desktop">
+          <AnimatePresence>
+            {searchOpen && (
+              <motion.div
+                className="search-input-wrapper"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 300, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <input
+                  id="search-input"
+                  type="text"
+                  placeholder="Search movies and TV..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="search-input"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <button
+            className={`search-icon-btn ${searchOpen ? 'active' : ''}`}
+            onClick={toggleSearch}
+            aria-label="Toggle search"
+          >
+            <AnimatePresence mode="wait">
+              {searchOpen ? (
+                <motion.svg
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </motion.svg>
+              ) : (
+                <motion.svg
+                  key="search"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </motion.svg>
+              )}
+            </AnimatePresence>
+          </button>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          className="mobile-menu-btn mobile"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={`hamburger ${mobileMenuOpen ? 'open' : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="mobile-menu"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="mobile-menu-content">
+              <NavLink
+                to="/"
+                className="mobile-navigation-link"
+                onClick={handleNavClick}
+                end
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/now-playing"
+                className="mobile-navigation-link"
+                onClick={handleNavClick}
+              >
+                Now Playing
+              </NavLink>
+              <NavLink
+                to="/upcoming"
+                className="mobile-navigation-link"
+                onClick={handleNavClick}
+              >
+                Upcoming
+              </NavLink>
+              <NavLink
+                to="/tv-trending"
+                className="mobile-navigation-link"
+                onClick={handleNavClick}
+              >
+                Trending TV
+              </NavLink>
+
+              {/* Mobile Search */}
+              <div className="mobile-search">
+                <input
+                  type="text"
+                  placeholder="Search movies and TV..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="mobile-search-input"
+                />
+                <button className="mobile-search-btn" onClick={handleSearch}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
   );
 };
 

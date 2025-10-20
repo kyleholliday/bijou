@@ -18,7 +18,12 @@ const UpcomingMovies = () => {
         },
       })
       .then((response) => {
-        setMovies(response.data.results);
+        const today = new Date();
+        const filtered = response.data.results.filter((movie) => {
+          const release = new Date(movie.release_date);
+          return release >= today;
+        });
+        setMovies(filtered);
       })
       .catch((error) => {
         console.error('Error fetching the Upcoming movies:', error);
@@ -35,7 +40,6 @@ const UpcomingMovies = () => {
       <ul className="movie-list">
         {firstTwelve.map((movie) => (
           <li key={movie.id} className="movie">
-            {/* <h2>{movie.title}</h2> */}
             <a href={`/movie/${movie.id}`}>
               <img
                 src={

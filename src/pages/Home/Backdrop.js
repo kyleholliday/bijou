@@ -1,7 +1,11 @@
-import React from 'react';
 import '../../styles/Backdrop.scss';
+import { useEffect } from 'react';
 
 const HeroBackdrop = () => {
+  useEffect(() => {
+    document.title = 'BIJOU - The movies and TV that you want to see';
+  }, []);
+
   return (
     <section className="hero-section">
       <div className="hero-container">

@@ -14,9 +14,8 @@ const MovieDetail = () => {
 
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
-    const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Csimilar%2Cvideos%2Cimages`;
+    const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Csimilar%2Cvideos%2Cimages%2Crelease_dates`;
     const providersEndpoint = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers`;
-    window.scrollTo(0, 0);
 
     axios
       .get(endpoint, {
@@ -25,8 +24,19 @@ const MovieDetail = () => {
         },
       })
       .then((response) => {
+        // Extract U.S. content rating
+        const usRelease = response.data.release_dates?.results?.find(
+          (r) => r.iso_3166_1 === 'US'
+        );
+        const certification =
+          usRelease?.release_dates?.find((d) => d.certification)
+            ?.certification || null;
+
+        response.data.certification = certification;
+
         setMovie(response.data);
         document.title = response.data.title;
+
         if (response.data.belongs_to_collection) {
           const collectionId = response.data.belongs_to_collection.id;
           const collectionEndpoint = `https://api.themoviedb.org/3/collection/${collectionId}`;
@@ -36,7 +46,6 @@ const MovieDetail = () => {
             })
             .then((collectionResponse) => {
               setCollection(collectionResponse.data);
-              console.log(collectionResponse.data);
             })
             .catch((error) => {
               console.error('Error fetching Collection Details:', error);
@@ -231,7 +240,8 @@ const MovieDetail = () => {
                 <span className="meta-item">
                   {getReleaseYear(movie.release_date)}
                 </span>
-                {movie.runtime && (
+
+                {Number(movie.runtime) > 0 && (
                   <>
                     <span className="meta-divider">•</span>
                     <span className="meta-item">
@@ -239,7 +249,32 @@ const MovieDetail = () => {
                     </span>
                   </>
                 )}
+
+                {/* {movie.vote_average > 0 && (
+                  <>
+                    <span className="meta-divider">•</span>
+                    <span className="meta-item rating-badge">
+                      <span className="star-icon">⭐</span>
+                      <span className="rating-value">
+                        {movie.vote_average.toFixed(1)}
+                      </span>
+                    </span>
+                  </>
+                )} */}
+
+                {movie.certification && (
+                  <>
+                    <span className="meta-divider">•</span>
+                    <span
+                      className="meta-item certification-badge"
+                      data-cert={movie.certification}
+                    >
+                      {movie.certification}
+                    </span>
+                  </>
+                )}
               </div>
+
               {movie.credits.crew.some(
                 (crewMember) => crewMember.job.toLowerCase() === 'director'
               ) && (
@@ -253,7 +288,7 @@ const MovieDetail = () => {
                     .map((director, index, array) => (
                       <span key={director.id}>
                         <Link
-                          to={`/director-films/${director.id}`}
+                          to={`/director/${director.id}`}
                           className="director-link"
                         >
                           {director.name}
@@ -436,7 +471,7 @@ const MovieDetail = () => {
             {/* Related Films */}
             {collection && (
               <div className="related-section">
-                <h3 className="section-title">More from {collection.name}</h3>
+                <h3 className="section-title">{collection.name}</h3>
                 <div className="related-grid">
                   {collection.parts.map((collectionMovie) => (
                     <Link

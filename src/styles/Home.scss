@@ -1,0 +1,13 @@
+// Home.scss
+.home-page {
+  min-height: 100vh;
+  background-color: #14181C;
+
+  .home-content {
+    padding-top: 2rem;
+
+    @media (max-width: 768px) {
+      padding-top: 1rem;
+    }
+  }
+}

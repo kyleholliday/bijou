@@ -1,7 +1,6 @@
-// src/SearchResults.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import '../../styles/SearchResults.scss';
 
 const SearchResults = () => {
@@ -10,11 +9,12 @@ const SearchResults = () => {
   let query = searchParams.get('query');
 
   const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
     const endPoint = 'https://api.themoviedb.org/3/search/multi';
-    window.scrollTo(0, 0);
+    setLoading(true);
 
     axios
       .get(endPoint, {
@@ -25,11 +25,17 @@ const SearchResults = () => {
         },
       })
       .then((response) => {
-        setSearchResults(response.data.results);
+        // Filter out people from results
+        const filteredResults = response.data.results.filter(
+          (item) => item.media_type === 'movie' || item.media_type === 'tv'
+        );
+        setSearchResults(filteredResults);
         document.title = `Search results for: ${query}`;
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching search results:', error);
+        setLoading(false);
       });
   }, [query]);
 
@@ -40,93 +46,82 @@ const SearchResults = () => {
         return dateParts[0];
       }
     }
-    return 'Release TBD';
+    return null;
   };
 
-  return (
-    <div className="container">
-      <div className="search-results">
-        <p className="search-results-for col-md-7 offset-md-2">
-          {searchResults.length < 1 ? (
-            <>No search results for "{query}"</>
-          ) : (
-            <>Search results for "{query}"</>
-          )}
-        </p>
-        <div className="row">
-          <ul>
-            {searchResults.map((movie) => (
-              <li key={movie.id}>
-                <div className="col-3 col-md-2 offset-md-2 image-holder">
-                  {movie.title && (
-                    <a href={`/movie/${movie.id}`}>
-                      <img
-                        src={
-                          movie.poster_path
-                            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                            : '/nope.png'
-                        }
-                        alt={movie.title}
-                        className="img-fluid"
-                      />
-                    </a>
-                  )}
-                  {movie.name && (
-                    <a href={`/show/${movie.id}`}>
-                      <img
-                        src={
-                          movie.poster_path
-                            ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                            : '/nope.png'
-                        }
-                        alt={movie.title}
-                        className="img-fluid"
-                      />
-                    </a>
-                  )}
-                </div>
-                <div className="col-8 col-md-5">
-                  <h3>
-                    {movie.title && (
-                      <a className="card-title" href={`/movie/${movie.id}`}>
-                        {movie.title}
-                      </a>
-                    )}
-                    {movie.name && (
-                      <a className="card-title" href={`/show/${movie.id}`}>
-                        {movie.name}
-                      </a>
-                    )}
-                  </h3>
-                  <p className="release-and-type">
-                    {movie.title && <>Movie </>}
-                    {movie.release_date && (
-                      <span className="release-and-type">
-                        - {getReleaseYear(movie.release_date)}
-                      </span>
-                    )}
-                    {movie.name && <>TV Show </>}
-                    {movie.first_air_date && (
-                      <span className="release-and-type">
-                        - {getReleaseYear(movie.first_air_date)}
-                      </span>
-                    )}
-                  </p>
-                  {/* <p className="release-year">
-                  {movie.release_date && (
-                    <span>{getReleaseYear(movie.release_date)}</span>
-                  )}
-                  {movie.name && (
-                    <span>{movie.first_air_date.split('-')[0]} </span>
-                  )}
-                </p> */}
-                  <p className="overview d-none d-sm-block">{movie.overview}</p>
-                  {/* Add more details or links as needed */}
-                </div>
-              </li>
-            ))}
-          </ul>
+  if (loading) {
+    return (
+      <div className="search-wrapper">
+        <div className="container">
+          <div className="loading-state">Loading results...</div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="search-wrapper">
+      <div className="container">
+        <div className="search-header">
+          <h1 className="search-title">
+            {searchResults.length < 1 ? (
+              <>No results for "{query}"</>
+            ) : (
+              <>Search results for "{query}"</>
+            )}
+          </h1>
+          {searchResults.length > 0 && (
+            <p className="search-count">
+              {searchResults.length} result
+              {searchResults.length !== 1 ? 's' : ''} found
+            </p>
+          )}
+        </div>
+
+        {searchResults.length > 0 ? (
+          <div className="search-results-list">
+            {searchResults.map((item) => {
+              const isMovie = item.media_type === 'movie';
+              const title = isMovie ? item.title : item.name;
+              const releaseDate = isMovie
+                ? item.release_date
+                : item.first_air_date;
+              const year = getReleaseYear(releaseDate);
+              const link = isMovie ? `/movie/${item.id}` : `/show/${item.id}`;
+
+              return (
+                <Link to={link} key={item.id} className="search-result-item">
+                  <div className="result-poster">
+                    <img
+                      src={
+                        item.poster_path
+                          ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                          : '/nope.png'
+                      }
+                      alt={title}
+                    />
+                  </div>
+                  <div className="result-content">
+                    <h2 className="result-title">{title}</h2>
+                    <div className="result-meta">
+                      <span className="media-type-badge">
+                        {isMovie ? 'Movie' : 'TV Show'}
+                      </span>
+                      {year && <span className="result-year">{year}</span>}
+                    </div>
+                    {item.overview && (
+                      <p className="result-overview">{item.overview}</p>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="no-results">
+            <p>Try adjusting your search terms or checking for typos.</p>
+          </div>
+        )}
       </div>
     </div>
   );

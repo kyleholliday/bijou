@@ -9,7 +9,6 @@ const UpcomingMoviesPage = () => {
     const apiKey = process.env.REACT_APP_API_KEY;
     const today = new Date().toISOString().split('T')[0];
     const endpoint = `https://api.themoviedb.org/3/movie/upcoming?primary_release_date.gte=${today}`;
-    window.scrollTo(0, 0);
 
     axios
       .get(endpoint, {

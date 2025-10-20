@@ -18,8 +18,6 @@ const TVDetail = () => {
         const endpoint = `https://api.themoviedb.org/3/tv/${tvId}?append_to_response=videos,credits,images`;
         const providersEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/watch/providers`;
 
-        window.scrollTo(0, 0);
-
         const [showRes, providersRes] = await Promise.all([
           axios.get(endpoint, { params: { api_key: apiKey } }),
           axios.get(providersEndpoint, { params: { api_key: apiKey } }),
@@ -38,31 +36,38 @@ const TVDetail = () => {
     fetchData();
   }, [tvId]);
 
-  const findTrailers = () => {
-    if (!show || !show.videos.results) return null;
+  const getBestTrailer = (show) => {
+    if (!show?.videos?.results?.length) return null;
 
-    const trailerSort = show.videos.results.filter((video) =>
-      video.type.toLowerCase().includes('trailer')
+    const trailers = show.videos.results.filter(
+      (v) => v.type === 'Trailer' && v.site === 'YouTube'
     );
 
-    const trailerOne = trailerSort.filter(
-      (trailer) =>
-        trailer.name.toLowerCase().includes('main trailer') ||
-        trailer.name.toLowerCase().includes('official trailer') ||
-        trailer.name.toLowerCase().includes('official us trailer') ||
-        trailer.name.toLowerCase().includes('official redband trailer')
-    );
+    if (!trailers.length) return null;
 
-    return trailerOne.length > 0
-      ? trailerOne[trailerOne.length - 1]
-      : show.videos[show.videos.length - 1];
+    trailers.sort((a, b) => {
+      // Prefer official trailers
+      if (a.official && !b.official) return -1;
+      if (!a.official && b.official) return 1;
+
+      // Prefer US region
+      if (a.iso_3166_1 === 'US' && b.iso_3166_1 !== 'US') return -1;
+      if (a.iso_3166_1 !== 'US' && b.iso_3166_1 === 'US') return 1;
+
+      // Prefer “Official Trailer” or “Main Trailer” by name
+      const aIsMain = /official|main/i.test(a.name);
+      const bIsMain = /official|main/i.test(b.name);
+      if (aIsMain && !bIsMain) return -1;
+      if (!aIsMain && bIsMain) return 1;
+
+      // Otherwise, fallback to most recent upload (highest id)
+      return b.id.localeCompare(a.id);
+    });
+
+    return trailers[0];
   };
 
-  const trailerOne =
-    findTrailers('main trailer') ||
-    findTrailers('official trailer') ||
-    findTrailers('official us trailer') ||
-    findTrailers('official red band trailer');
+  const bestTrailer = getBestTrailer(show);
 
   if (!show) {
     return <div>Loading...</div>;
@@ -107,9 +112,9 @@ const TVDetail = () => {
                 className="poster-image"
               />
             </div>
-            {trailerOne && (
+            {bestTrailer && (
               <a
-                href={`https://www.youtube.com/watch?v=${trailerOne.key}`}
+                href={`https://www.youtube.com/watch?v=${bestTrailer.key}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="trailer-button"
@@ -181,6 +186,27 @@ const TVDetail = () => {
                   </>
                 )}
               </p>
+              {/* {show.created_by && show.created_by.length > 0 && (
+                <div className="director-info">
+                  Created by{' '}
+                  {show.created_by.map((creator, index, array) => (
+                    <span key={creator.id}>
+                      <span className="director-link">{creator.name}</span>
+                      {index < array.length - 1 ? ', ' : ''}
+                    </span>
+                  ))}
+                </div>
+              )} */}
+              {/* {show.status.toLowerCase() === 'returning series' && (
+                <div className="director-info">
+                  <span
+                    className="genre-badge"
+                    style={{ display: 'inline-block', marginTop: '0.5rem' }}
+                  >
+                    Ongoing Series
+                  </span>
+                </div>
+              )} */}
             </div>
             {show.tagline && <p className="movie-tagline">"{show.tagline}"</p>}
 
