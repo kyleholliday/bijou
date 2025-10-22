@@ -13,67 +13,66 @@ const MovieDetail = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_API_KEY;
-    const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Csimilar%2Cvideos%2Cimages%2Crelease_dates`;
-    const providersEndpoint = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers`;
+    window.scrollTo(0, 0);
 
-    axios
-      .get(endpoint, {
-        params: {
-          api_key: apiKey,
-        },
-      })
-      .then((response) => {
+    const fetchMovieData = async () => {
+      const apiKey = process.env.REACT_APP_API_KEY;
+      const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Cvideos%2Crelease_dates`;
+      const providersEndpoint = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers`;
+
+      try {
+        // Fetch movie details and providers in parallel
+        const [movieResponse, providersResponse] = await Promise.all([
+          axios.get(endpoint, { params: { api_key: apiKey } }),
+          axios.get(providersEndpoint, { params: { api_key: apiKey } }),
+        ]);
+
+        // Process movie data
+        const movieData = movieResponse.data;
+
         // Extract U.S. content rating
-        const usRelease = response.data.release_dates?.results?.find(
+        const usRelease = movieData.release_dates?.results?.find(
           (r) => r.iso_3166_1 === 'US'
         );
         const certification =
           usRelease?.release_dates?.find((d) => d.certification)
             ?.certification || null;
 
-        response.data.certification = certification;
+        movieData.certification = certification;
+        setMovie(movieData);
+        document.title = movieData.title;
 
-        setMovie(response.data);
-        document.title = response.data.title;
-
-        if (response.data.belongs_to_collection) {
-          const collectionId = response.data.belongs_to_collection.id;
-          const collectionEndpoint = `https://api.themoviedb.org/3/collection/${collectionId}`;
-          axios
-            .get(collectionEndpoint, {
-              params: { api_key: apiKey },
-            })
-            .then((collectionResponse) => {
-              setCollection(collectionResponse.data);
-            })
-            .catch((error) => {
-              console.error('Error fetching Collection Details:', error);
-            });
-        }
-        if (response.data.credits && response.data.credits.cast.length > 0) {
+        // Set initial display section
+        if (movieData.credits?.cast?.length > 0) {
           setDisplaySection('cast');
         } else {
           setDisplaySection('crew');
         }
-      })
-      .catch((error) => {
-        console.error('Error fetching Movie Details:', error);
-      });
 
-    axios
-      .get(providersEndpoint, {
-        params: {
-          api_key: apiKey,
-        },
-      })
-      .then((response) => {
-        const usData = response.data.results.US;
-        setUsProviders(usData);
-      })
-      .catch((error) => {
-        console.error('Error fetching Watch Providers', error);
-      });
+        // Process providers
+        const providersData = providersResponse.data.results?.US || null;
+        setUsProviders(providersData);
+
+        // Fetch collection if exists
+        if (movieData.belongs_to_collection) {
+          const collectionId = movieData.belongs_to_collection.id;
+          const collectionEndpoint = `https://api.themoviedb.org/3/collection/${collectionId}`;
+
+          try {
+            const collectionResponse = await axios.get(collectionEndpoint, {
+              params: { api_key: apiKey },
+            });
+            setCollection(collectionResponse.data);
+          } catch (error) {
+            console.error('Error fetching Collection Details:', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching Movie Details:', error);
+      }
+    };
+
+    fetchMovieData();
   }, [movieId]);
 
   const getReleaseYear = (dateString) => {
@@ -83,30 +82,25 @@ const MovieDetail = () => {
         return dateParts[0];
       }
     }
-    return 'Release TBD';
+    return 'TBD';
   };
 
-  function timeConverter(minutesString) {
+  const timeConverter = (minutesString) => {
     const totalMinutes = parseInt(minutesString, 10);
-
-    if (isNaN(totalMinutes)) {
-      return 'Invalid input';
-    }
+    if (isNaN(totalMinutes)) return '';
 
     const hours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
 
     let formattedTime = hours > 0 ? `${hours}h` : '';
-
     if (remainingMinutes > 0) {
       formattedTime +=
         hours > 0 ? ` ${remainingMinutes}m` : `${remainingMinutes}m`;
     }
 
     return formattedTime;
-  }
+  };
 
-  // Trailer
   const getBestTrailer = (movie) => {
     if (!movie?.videos?.results?.length) return null;
 
@@ -117,28 +111,26 @@ const MovieDetail = () => {
     if (!trailers.length) return null;
 
     trailers.sort((a, b) => {
-      // Prefer official trailers
       if (a.official && !b.official) return -1;
       if (!a.official && b.official) return 1;
-
-      // Prefer US region
       if (a.iso_3166_1 === 'US' && b.iso_3166_1 !== 'US') return -1;
       if (a.iso_3166_1 !== 'US' && b.iso_3166_1 === 'US') return 1;
 
-      // Prefer “Official Trailer” or “Main Trailer” by name
       const aIsMain = /official|main|theatrical/i.test(a.name);
       const bIsMain = /official|main|theatrical/i.test(b.name);
       if (aIsMain && !bIsMain) return -1;
       if (!aIsMain && bIsMain) return 1;
 
-      // Otherwise, fallback to most recent upload (highest id)
       return b.id.localeCompare(a.id);
     });
 
     return trailers[0];
   };
 
-  const bestTrailer = getBestTrailer(movie);
+  const filterCrewByJob = (job) =>
+    movie?.credits?.crew?.filter(
+      (crewMember) => crewMember.job?.toLowerCase() === job
+    ) || [];
 
   if (!movie) {
     return (
@@ -148,14 +140,7 @@ const MovieDetail = () => {
     );
   }
 
-  const filterCrewByJob = (job) =>
-    movie.credits.crew.filter(
-      (crewMember) => crewMember.job && crewMember.job.toLowerCase() === job
-    );
-
-  const handleSectionClick = (section) => {
-    setDisplaySection(section);
-  };
+  const bestTrailer = getBestTrailer(movie);
 
   console.log(movie);
 
@@ -215,7 +200,7 @@ const MovieDetail = () => {
               </a>
             )}
             {/* Streaming Providers */}
-            {usProviders && usProviders.flatrate && (
+            {usProviders?.flatrate && (
               <div className="providers-section">
                 <p className="section-label">Stream On</p>
                 <div className="providers-list">
@@ -250,18 +235,6 @@ const MovieDetail = () => {
                   </>
                 )}
 
-                {/* {movie.vote_average > 0 && (
-                  <>
-                    <span className="meta-divider">•</span>
-                    <span className="meta-item rating-badge">
-                      <span className="star-icon">⭐</span>
-                      <span className="rating-value">
-                        {movie.vote_average.toFixed(1)}
-                      </span>
-                    </span>
-                  </>
-                )} */}
-
                 {movie.certification && (
                   <>
                     <span className="meta-divider">•</span>
@@ -275,27 +248,20 @@ const MovieDetail = () => {
                 )}
               </div>
 
-              {movie.credits.crew.some(
-                (crewMember) => crewMember.job.toLowerCase() === 'director'
-              ) && (
+              {filterCrewByJob('director').length > 0 && (
                 <div className="director-info">
                   Directed by{' '}
-                  {movie.credits.crew
-                    .filter(
-                      (crewMember) =>
-                        crewMember.job.toLowerCase() === 'director'
-                    )
-                    .map((director, index, array) => (
-                      <span key={director.id}>
-                        <Link
-                          to={`/director/${director.id}`}
-                          className="director-link"
-                        >
-                          {director.name}
-                        </Link>
-                        {index < array.length - 1 ? ', ' : ''}
-                      </span>
-                    ))}
+                  {filterCrewByJob('director').map((director, index, array) => (
+                    <span key={director.id}>
+                      <Link
+                        to={`/director/${director.id}`}
+                        className="director-link"
+                      >
+                        {director.name}
+                      </Link>
+                      {index < array.length - 1 ? ', ' : ''}
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
@@ -307,7 +273,7 @@ const MovieDetail = () => {
             <p className="movie-overview">{movie.overview}</p>
 
             {/* Genres */}
-            {movie.genres.length > 0 && (
+            {movie.genres?.length > 0 && (
               <div className="genres-section">
                 {movie.genres.map((genre) => (
                   <span key={genre.id} className="genre-badge">
@@ -320,9 +286,9 @@ const MovieDetail = () => {
             {/* Cast/Crew Tabs */}
             <div className="cast-crew-section">
               <div className="tabs-nav">
-                {movie.credits.cast.length > 0 && (
+                {movie.credits?.cast?.length > 0 && (
                   <button
-                    onClick={() => handleSectionClick('cast')}
+                    onClick={() => setDisplaySection('cast')}
                     className={`tab-button ${
                       displaySection === 'cast' ? 'active' : ''
                     }`}
@@ -331,7 +297,7 @@ const MovieDetail = () => {
                   </button>
                 )}
                 <button
-                  onClick={() => handleSectionClick('crew')}
+                  onClick={() => setDisplaySection('crew')}
                   className={`tab-button ${
                     displaySection === 'crew' ? 'active' : ''
                   }`}
@@ -341,130 +307,133 @@ const MovieDetail = () => {
               </div>
 
               <div className="tab-content">
-                {movie.credits.cast.length > 0 && displaySection === 'cast' && (
-                  <div className="cast-grid">
-                    {movie.credits.cast.slice(0, 20).map((castMember) => (
-                      <OverlayTrigger
-                        key={castMember.id}
-                        placement="top"
-                        overlay={
-                          castMember.character ? (
-                            <Tooltip id={`tooltip-${castMember.id}`}>
-                              {castMember.character}
-                            </Tooltip>
-                          ) : (
-                            <></>
-                          )
-                        }
-                        delay={{ show: 300, hide: 0 }}
-                      >
-                        <Link
-                          to={`/actor/${castMember.id}`}
-                          className="cast-badge"
+                {movie.credits?.cast?.length > 0 &&
+                  displaySection === 'cast' && (
+                    <div className="cast-grid">
+                      {movie.credits.cast.slice(0, 20).map((castMember) => (
+                        <OverlayTrigger
+                          key={castMember.id}
+                          placement="top"
+                          overlay={
+                            castMember.character ? (
+                              <Tooltip id={`tooltip-${castMember.id}`}>
+                                {castMember.character}
+                              </Tooltip>
+                            ) : (
+                              <></>
+                            )
+                          }
+                          delay={{ show: 300, hide: 0 }}
                         >
-                          {castMember.name}
-                        </Link>
-                      </OverlayTrigger>
-                    ))}
-                  </div>
-                )}
+                          <Link
+                            to={`/actor/${castMember.id}`}
+                            className="cast-badge"
+                          >
+                            {castMember.name}
+                          </Link>
+                        </OverlayTrigger>
+                      ))}
+                    </div>
+                  )}
 
-                {movie.credits.crew.length > 0 && displaySection === 'crew' && (
-                  <div className="crew-grid">
-                    {filterCrewByJob('director').length > 0 && (
-                      <div className="crew-category">
-                        <p className="crew-role">
-                          Director
-                          {filterCrewByJob('director').length > 1 && 's'}
-                        </p>
-                        <div className="crew-names">
-                          {filterCrewByJob('director').map((director) => (
-                            <span key={director.id} className="crew-name">
-                              {director.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {filterCrewByJob('screenplay').length > 0 && (
-                      <div className="crew-category">
-                        <p className="crew-role">
-                          Writer
-                          {filterCrewByJob('screenplay').length > 1 && 's'}
-                        </p>
-                        <div className="crew-names">
-                          {filterCrewByJob('screenplay').map((writer) => (
-                            <span key={writer.id} className="crew-name">
-                              {writer.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {filterCrewByJob('writer').length > 0 && (
-                      <div className="crew-category">
-                        <p className="crew-role">
-                          Writer
-                          {filterCrewByJob('writer').length > 1 && 's'}
-                        </p>
-                        <div className="crew-names">
-                          {filterCrewByJob('writer').map((writer) => (
-                            <span key={writer.id} className="crew-name">
-                              {writer.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {filterCrewByJob('producer').length > 0 && (
-                      <div className="crew-category">
-                        <p className="crew-role">
-                          Producer
-                          {filterCrewByJob('producer').length > 1 && 's'}
-                        </p>
-                        <div className="crew-names">
-                          {filterCrewByJob('producer').map((producer) => (
-                            <span key={producer.id} className="crew-name">
-                              {producer.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {filterCrewByJob('director of photography').length > 0 && (
-                      <div className="crew-category">
-                        <p className="crew-role">Cinematography</p>
-                        <div className="crew-names">
-                          {filterCrewByJob('director of photography').map(
-                            (dp) => (
-                              <span key={dp.id} className="crew-name">
-                                {dp.name}
+                {movie.credits?.crew?.length > 0 &&
+                  displaySection === 'crew' && (
+                    <div className="crew-grid">
+                      {filterCrewByJob('director').length > 0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">
+                            Director
+                            {filterCrewByJob('director').length > 1 && 's'}
+                          </p>
+                          <div className="crew-names">
+                            {filterCrewByJob('director').map((director) => (
+                              <span key={director.id} className="crew-name">
+                                {director.name}
                               </span>
-                            )
-                          )}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {filterCrewByJob('original music composer').length > 0 && (
-                      <div className="crew-category">
-                        <p className="crew-role">
-                          Composer
-                          {filterCrewByJob('original music composer').length >
-                            1 && 's'}
-                        </p>
-                        <div className="crew-names">
-                          {filterCrewByJob('original music composer').map(
-                            (composer) => (
-                              <span key={composer.id} className="crew-name">
-                                {composer.name}
+                      )}
+                      {filterCrewByJob('screenplay').length > 0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">
+                            Writer
+                            {filterCrewByJob('screenplay').length > 1 && 's'}
+                          </p>
+                          <div className="crew-names">
+                            {filterCrewByJob('screenplay').map((writer) => (
+                              <span key={writer.id} className="crew-name">
+                                {writer.name}
                               </span>
-                            )
-                          )}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                      {filterCrewByJob('writer').length > 0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">
+                            Writer{filterCrewByJob('writer').length > 1 && 's'}
+                          </p>
+                          <div className="crew-names">
+                            {filterCrewByJob('writer').map((writer) => (
+                              <span key={writer.id} className="crew-name">
+                                {writer.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {filterCrewByJob('producer').length > 0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">
+                            Producer
+                            {filterCrewByJob('producer').length > 1 && 's'}
+                          </p>
+                          <div className="crew-names">
+                            {filterCrewByJob('producer').map((producer) => (
+                              <span key={producer.id} className="crew-name">
+                                {producer.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {filterCrewByJob('director of photography').length >
+                        0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">Cinematography</p>
+                          <div className="crew-names">
+                            {filterCrewByJob('director of photography').map(
+                              (dp) => (
+                                <span key={dp.id} className="crew-name">
+                                  {dp.name}
+                                </span>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {filterCrewByJob('original music composer').length >
+                        0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">
+                            Composer
+                            {filterCrewByJob('original music composer').length >
+                              1 && 's'}
+                          </p>
+                          <div className="crew-names">
+                            {filterCrewByJob('original music composer').map(
+                              (composer) => (
+                                <span key={composer.id} className="crew-name">
+                                  {composer.name}
+                                </span>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
 

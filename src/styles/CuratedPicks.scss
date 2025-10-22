@@ -1,0 +1,266 @@
+// CuratedPicks.scss
+.curated-picks {
+  padding: 6rem 2rem 8rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg,
+      #14181C 0%,
+      rgba(20, 10, 30, 0.9) 30%,
+      rgba(40, 15, 0, 0.9) 70%,
+      rgba(20, 10, 10, 0.8) 100%);
+
+  @media (max-width: 768px) {
+    padding: 5rem 1rem 3rem;
+  }
+
+  // Theme variations
+  &.dark {
+    background: linear-gradient(180deg,
+        #14181C 0%,
+        rgba(20, 10, 30, 0.9) 50%,
+        rgba(10, 10, 10, 0.8) 100%);
+  }
+
+  &.halloween {
+    background: linear-gradient(180deg,
+        #14181C 0%,
+        rgba(40, 15, 0, 0.9) 50%,
+        rgba(20, 10, 10, 0.8) 100%);
+  }
+
+  // Background accent
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 100%;
+    background: radial-gradient(ellipse at center,
+        rgba(255, 165, 0, 0.05) 0%,
+        transparent 70%);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: #14181c;
+    clip-path: polygon(0 50%, 100% 0, 100% 100%, 0 100%);
+    z-index: 0;
+
+    @media (max-width: 768px) {
+      height: 60px;
+    }
+  }
+
+  //   background: #14181c;
+  //   clip-path: polygon(0 100%, 0 60%, 50% 0, 100% 60%, 100% 100%);
+  //   z-index: 0;
+  // }
+
+  .curated-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+
+    .curated-header {
+      text-align: center;
+      margin-bottom: 3rem;
+
+      @media (max-width: 768px) {
+        margin-bottom: 2rem;
+      }
+
+      .header-content {
+        display: inline-block;
+
+        .header-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1.2rem;
+          background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+          color: #000;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 1rem;
+          box-shadow: 0 4px 20px rgba(255, 165, 0, 0.3);
+
+          svg {
+            width: 18px;
+            height: 18px;
+          }
+
+          @media (max-width: 768px) {
+            font-size: 0.8rem;
+            padding: 0.4rem 1rem;
+          }
+        }
+
+        .curated-title {
+          font-size: 2.5rem;
+          font-weight: 800;
+          color: #fff;
+          margin: 0 0 1rem;
+          line-height: 1.2;
+          letter-spacing: -0.02em;
+
+          @media (max-width: 768px) {
+            font-size: 1.8rem;
+          }
+        }
+
+        .curated-description {
+          font-size: 1.1rem;
+          color: rgba(255, 255, 255, 0.7);
+          margin: 0;
+          max-width: 600px;
+          line-height: 1.6;
+
+          @media (max-width: 768px) {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+
+    .curated-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .curated-card {
+        position: relative;
+        display: block;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+
+        &:hover {
+          border-color: #ffa500;
+          transform: translateY(-8px);
+          box-shadow: 0 12px 40px rgba(255, 165, 0, 0.3);
+
+          .card-image {
+            transform: scale(1.05);
+          }
+
+          // .card-gradient {
+          //   opacity: 0.8;
+          // }
+        }
+
+        .card-image-wrapper {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 2/3;
+          overflow: hidden;
+          background: #1a1a1a;
+
+          .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+          }
+
+          // .card-gradient {
+          //   position: absolute;
+          //   bottom: 0;
+          //   left: 0;
+          //   right: 0;
+          //   height: 60%;
+          //   background: linear-gradient(to top,
+          //       rgba(0, 0, 0, 0.95) 0%,
+          //       rgba(0, 0, 0, 0.7) 40%,
+          //       transparent 100%);
+          //   opacity: 0.9;
+          //   transition: opacity 0.3s ease;
+          // }
+        }
+
+        .card-content {
+          padding: 1.5rem;
+          position: relative;
+
+          @media (max-width: 768px) {
+            padding: 1.25rem;
+          }
+
+          .card-info {
+            margin-bottom: 1rem;
+
+            .card-title {
+              font-size: 1.25rem;
+              font-weight: 700;
+              color: #fff;
+              margin: 0 0 0.5rem;
+              line-height: 1.3;
+              display: -webkit-box;
+              -webkit-line-clamp: 2;
+              line-clamp: 2;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+
+              @media (max-width: 768px) {
+                font-size: 1.1rem;
+              }
+            }
+
+            .card-meta {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              font-size: 0.9rem;
+
+              .card-year {
+                color: rgba(255, 255, 255, 0.6);
+                font-weight: 600;
+              }
+
+              .meta-dot {
+                color: rgba(255, 255, 255, 0.3);
+              }
+
+              .card-rating {
+                color: #ffd700;
+                font-weight: 600;
+              }
+            }
+          }
+
+          .card-overview {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.65);
+            margin: 0;
+
+            @media (max-width: 768px) {
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

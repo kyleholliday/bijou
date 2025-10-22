@@ -28,47 +28,40 @@ const getAge = (dob, deathday) => {
 const getImage = (path) =>
   path ? `https://image.tmdb.org/t/p/w500${path}` : '/nope.png';
 
-const CACHE_EXPIRY = 1000 * 60 * 60 * 6; // 6 hours
-
 // Main Component
 const Person = () => {
   const { personId } = useParams();
   const location = useLocation();
   const [data, setData] = useState(null);
   const [showFullBio, setShowFullBio] = useState(false);
-  const [primaryTab, setPrimaryTab] = useState('movies'); // For Movies/TV tabs
+  const [primaryTab, setPrimaryTab] = useState('movies');
   const [movieSort, setMovieSort] = useState('popularity');
   const [tvSort, setTvSort] = useState('popularity');
 
-  // Detect if we're on actor or director route
   const isActorRoute = location.pathname.includes('/actor/');
   const isDirectorRoute = location.pathname.includes('/director/');
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_API_KEY;
-    const cacheKey = `person_${personId}`;
-    const cached = localStorage.getItem(cacheKey);
+    window.scrollTo(0, 0);
 
-    if (cached) {
-      const { timestamp, payload } = JSON.parse(cached);
-      if (Date.now() - timestamp < CACHE_EXPIRY) {
-        setData(payload);
-        document.title = payload.details.name;
-        return;
-      }
-    }
+    const fetchPersonData = async () => {
+      const apiKey = process.env.REACT_APP_API_KEY;
+      const detailsUrl = `https://api.themoviedb.org/3/person/${personId}`;
+      const creditsUrl = `https://api.themoviedb.org/3/person/${personId}/combined_credits`;
 
-    const detailsUrl = `https://api.themoviedb.org/3/person/${personId}`;
-    const creditsUrl = `https://api.themoviedb.org/3/person/${personId}/combined_credits`;
+      try {
+        const [detailsRes, creditsRes] = await Promise.all([
+          axios.get(detailsUrl, {
+            params: { api_key: apiKey, language: 'en-US' },
+          }),
+          axios.get(creditsUrl, {
+            params: { api_key: apiKey, language: 'en-US' },
+          }),
+        ]);
 
-    Promise.all([
-      axios.get(detailsUrl, { params: { api_key: apiKey, language: 'en-US' } }),
-      axios.get(creditsUrl, { params: { api_key: apiKey, language: 'en-US' } }),
-    ])
-      .then(([detailsRes, creditsRes]) => {
         const details = detailsRes.data;
 
-        // --- Process ACTING credits (from cast) ---
+        // Process ACTING credits
         const rawActing = creditsRes.data.cast.filter(
           (c) =>
             c.character?.trim() &&
@@ -77,7 +70,6 @@ const Person = () => {
             !c.adult
         );
 
-        // Deduplicate acting credits
         const seenActing = new Set();
         const actingCredits = rawActing.filter((credit) => {
           const key = `${credit.media_type}-${credit.id}`;
@@ -86,12 +78,11 @@ const Person = () => {
           return true;
         });
 
-        // --- Process DIRECTING credits (from crew) ---
+        // Process DIRECTING credits
         const rawDirecting = creditsRes.data.crew.filter(
           (c) => c.job?.toLowerCase() === 'director' && !c.adult
         );
 
-        // Deduplicate directing credits
         const seenDirecting = new Set();
         const directingCredits = rawDirecting.filter((credit) => {
           const key = `${credit.media_type}-${credit.id}`;
@@ -117,22 +108,17 @@ const Person = () => {
           .filter((c) => c.media_type === 'tv')
           .sort((a, b) => b.popularity - a.popularity);
 
-        const payload = {
+        setData({
           details,
           actingMovies,
           actingTV,
           directingMovies,
           directingTV,
-        };
+        });
 
-        setData(payload);
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({ timestamp: Date.now(), payload })
-        );
         document.title = details.name;
 
-        // Auto-select first available tab for primary section
+        // Auto-select first available tab
         if (isActorRoute) {
           if (actingMovies.length) setPrimaryTab('movies');
           else if (actingTV.length) setPrimaryTab('tv');
@@ -140,8 +126,12 @@ const Person = () => {
           if (directingMovies.length) setPrimaryTab('movies');
           else if (directingTV.length) setPrimaryTab('tv');
         }
-      })
-      .catch((err) => console.error('Fetch error:', err));
+      } catch (err) {
+        console.error('Fetch error:', err);
+      }
+    };
+
+    fetchPersonData();
   }, [personId, isActorRoute, isDirectorRoute]);
 
   // Sorting (memoized)
@@ -216,7 +206,6 @@ const Person = () => {
   const bioPreview = details.biography?.slice(0, 300);
   const showReadMore = details.biography?.length > 300;
 
-  // Determine primary and secondary sections based on route
   const primarySection = isActorRoute ? 'acting' : 'directing';
   const secondarySection = isActorRoute ? 'directing' : 'acting';
 
@@ -306,7 +295,7 @@ const Person = () => {
         </div>
       </div>
 
-      {/* PRIMARY SECTION (Acting for actors, Directing for directors) */}
+      {/* PRIMARY SECTION */}
       <div className="container">
         <div className="credits-section">
           {hasPrimaryContent && (
@@ -368,7 +357,7 @@ const Person = () => {
         </div>
       </div>
 
-      {/* SECONDARY SECTION (Directing for actors, Acting for directors) */}
+      {/* SECONDARY SECTION */}
       {hasSecondaryContent && (
         <div className="container">
           <div className="credits-section secondary-section">

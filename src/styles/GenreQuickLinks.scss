@@ -1,0 +1,157 @@
+// GenreQuickLinks.scss
+.genre-quick-links {
+  padding: 3rem 2rem 2rem;
+  background: linear-gradient(180deg,
+      rgba(10, 10, 10, 0) 0%,
+      rgba(10, 10, 10, 0.5) 50%,
+      rgba(10, 10, 10, 0) 100%);
+
+  @media (max-width: 768px) {
+    padding: 2rem 1rem 1.5rem;
+  }
+
+  .genre-container {
+    max-width: 1400px;
+    margin: 0 auto;
+
+    .genre-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 1.5rem;
+      text-align: center;
+
+      @media (max-width: 768px) {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+    }
+
+    .genre-scroll-wrapper {
+      position: relative;
+
+      .genre-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid rgba(255, 165, 0, 0.4);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #ffa500;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(10px);
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.95);
+          border-color: #ffa500;
+          transform: translateY(-50%) scale(1.05);
+        }
+
+        &.genre-arrow-left {
+          left: -20px;
+        }
+
+        &.genre-arrow-right {
+          right: -20px;
+        }
+
+        @media (max-width: 1024px) {
+          display: none;
+        }
+      }
+
+      .genre-scroll {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        padding: 0.5rem 0;
+
+        // Hide scrollbar on desktop
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          gap: 0.75rem;
+          // Show subtle scrollbar on mobile
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 165, 0, 0.3) transparent;
+
+          &::-webkit-scrollbar {
+            display: block;
+            height: 4px;
+          }
+
+          &::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+          }
+
+          &::-webkit-scrollbar-thumb {
+            background: rgba(255, 165, 0, 0.4);
+            border-radius: 10px;
+          }
+        }
+
+        .genre-pill {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          padding: 0.75rem 1.5rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          border-radius: 50px;
+          color: #fff;
+          text-decoration: none;
+          font-size: 1rem;
+          font-weight: 600;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+
+          @media (max-width: 768px) {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            gap: 0.5rem;
+          }
+
+          .genre-icon {
+            font-size: 1.25rem;
+            line-height: 1;
+
+            @media (max-width: 768px) {
+              font-size: 1.1rem;
+            }
+          }
+
+          .genre-name {
+            line-height: 1;
+          }
+
+          &:hover {
+            background: rgba(255, 165, 0, 0.15);
+            border-color: #ffa500;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.2);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+  }
+}

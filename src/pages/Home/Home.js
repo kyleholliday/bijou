@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Backdrop from './Backdrop';
+// import GenreQuickLinks from '../../components/GenreQuickLinks';
 import HorizontalScrollSection from '../../components/HorizontalScrollSection';
 import '../../styles/Home.scss';
+import CuratedPicks from '../../components/CuratedPicks';
 
 const Home = () => {
   const [nowPlaying, setNowPlaying] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
   const [trendingTV, setTrendingTV] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const halloweenPicks = [575776, 913290, 1008042];
 
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
@@ -67,7 +71,6 @@ const Home = () => {
         },
       })
       .then((response) => {
-        // Limit to first 12 shows like your original
         setTrendingTV(response.data.results.slice(0, 12));
       })
       .catch((error) => {
@@ -88,6 +91,16 @@ const Home = () => {
   return (
     <div className="home-page">
       <Backdrop />
+      {/* <GenreQuickLinks /> */}
+
+      <CuratedPicks
+        title="Modern Horror Hidden Gems"
+        description="Older movies not your style? Check these staff picks for the spooky season - modern horror hits that you might have missed."
+        movieIds={halloweenPicks}
+        theme="halloween"
+      />
+
+      {/* <div className="section-spacer"></div> */}
 
       <div className="home-content">
         {nowPlaying.length > 0 && (
