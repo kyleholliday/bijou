@@ -95,12 +95,10 @@ const Home = () => {
 
       <CuratedPicks
         title="Modern Horror Hidden Gems"
-        description="Older movies not your style? Check these staff picks for the spooky season - modern horror hits that you might have missed."
+        description="Older movies not your style? Check out these staff picks for the spooky season - modern horror hits that you might have missed."
         movieIds={halloweenPicks}
         theme="halloween"
       />
-
-      {/* <div className="section-spacer"></div> */}
 
       <div className="home-content">
         {nowPlaying.length > 0 && (

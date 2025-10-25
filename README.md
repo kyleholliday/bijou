@@ -6,4 +6,4 @@ Open [http://www.bijou-movies.com](http://www.bijou-movies.com) to view it in yo
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-![alt text](/public/full-site-home.png 'Bijou Homepage')
+![alt text](/public/full-site-home-2025.png 'Bijou Homepage')
