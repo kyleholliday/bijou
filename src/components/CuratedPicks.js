@@ -73,7 +73,7 @@ const CuratedPicks = ({ title, description, movieIds, theme = 'dark' }) => {
                     src={
                       movie.poster_path
                         ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                        : '/nope.png'
+                        : '/sorry.png'
                     }
                     alt={movie.title}
                     className="card-image"

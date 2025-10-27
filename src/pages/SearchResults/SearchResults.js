@@ -96,7 +96,7 @@ const SearchResults = () => {
                       src={
                         item.poster_path
                           ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                          : '/nope.png'
+                          : '/sorry.png'
                       }
                       alt={title}
                     />

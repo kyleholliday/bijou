@@ -26,7 +26,7 @@ const getAge = (dob, deathday) => {
   return age;
 };
 const getImage = (path) =>
-  path ? `https://image.tmdb.org/t/p/w500${path}` : '/nope.png';
+  path ? `https://image.tmdb.org/t/p/w500${path}` : '/sorry.png';
 
 const CACHE_EXPIRY = 1000 * 60 * 60 * 6; // 6 hours
 

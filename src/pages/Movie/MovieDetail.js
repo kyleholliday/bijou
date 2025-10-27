@@ -174,7 +174,7 @@ const MovieDetail = () => {
                 src={
                   movie.poster_path
                     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                    : '/nope.png'
+                    : '/sorry.png'
                 }
                 alt={movie.title}
                 className="poster-image"
@@ -452,7 +452,7 @@ const MovieDetail = () => {
                         src={
                           collectionMovie.poster_path
                             ? `https://image.tmdb.org/t/p/w500${collectionMovie.poster_path}`
-                            : '/nope.png'
+                            : '/sorry.png'
                         }
                         alt={collectionMovie.title}
                       />

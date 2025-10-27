@@ -135,7 +135,7 @@ const DirectorFilms = () => {
                   src={
                     directorDetails.profile_path
                       ? `https://image.tmdb.org/t/p/w500${directorDetails.profile_path}`
-                      : '/nope.png'
+                      : '/sorry.png'
                   }
                   alt={directorDetails.name}
                 />
@@ -262,7 +262,7 @@ const DirectorFilms = () => {
                         src={
                           movie.poster_path
                             ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                            : '/nope.png'
+                            : '/sorry.png'
                         }
                         alt={movie.title}
                       />
