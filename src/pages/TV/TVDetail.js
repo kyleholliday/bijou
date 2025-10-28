@@ -15,7 +15,7 @@ const TVDetail = () => {
     async function fetchData() {
       try {
         const apiKey = process.env.REACT_APP_API_KEY;
-        const endpoint = `https://api.themoviedb.org/3/tv/${tvId}?append_to_response=videos,credits,images`;
+        const endpoint = `https://api.themoviedb.org/3/tv/${tvId}?append_to_response=videos,credits,images,content_ratings`;
         const providersEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/watch/providers`;
 
         const [showRes, providersRes] = await Promise.all([
@@ -68,6 +68,16 @@ const TVDetail = () => {
   };
 
   const bestTrailer = getBestTrailer(show);
+
+  const getRating = (show) => {
+    if (!show?.content_ratings?.results) return null;
+
+    const usRating = show.content_ratings.results.find(
+      (r) => r.iso_3166_1 === 'US'
+    );
+
+    return usRating?.rating || null;
+  };
 
   if (!show) {
     return <div>Loading...</div>;
@@ -183,6 +193,12 @@ const TVDetail = () => {
                       {show.number_of_episodes} Episode
                       {show.number_of_episodes !== 1 ? 's' : ''}
                     </span>
+                  </>
+                )}
+                {getRating(show) && (
+                  <>
+                    <span className="meta-divider">•</span>
+                    <span className="meta-item">{getRating(show)}</span>
                   </>
                 )}
               </p>

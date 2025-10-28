@@ -151,10 +151,20 @@
         transition: all 0.3s ease;
         backdrop-filter: blur(10px);
 
+        // Mobile: horizontal layout
+        @media (max-width: 768px) {
+          display: flex;
+          flex-direction: row;
+        }
+
         &:hover {
           border-color: #ffa500;
           transform: translateY(-8px);
           box-shadow: 0 12px 40px rgba(255, 165, 0, 0.3);
+
+          @media (max-width: 768px) {
+            transform: translateY(-4px);
+          }
 
           .card-image {
             transform: scale(1.05);
@@ -171,6 +181,14 @@
           aspect-ratio: 2/3;
           overflow: hidden;
           background: #1a1a1a;
+
+          // Mobile: fixed width instead of full width
+          @media (max-width: 768px) {
+            width: 120px;
+            min-width: 120px;
+            aspect-ratio: unset;
+            height: auto;
+          }
 
           .card-image {
             width: 100%;
@@ -199,12 +217,21 @@
           position: relative;
           // background: #15181c91;
 
+          // Mobile: adjust padding and flex grow
           @media (max-width: 768px) {
-            padding: 1.25rem;
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
           }
 
           .card-info {
             margin-bottom: 1rem;
+
+            @media (max-width: 768px) {
+              margin-bottom: 0.5rem;
+            }
 
             .card-title {
               font-size: 1.25rem;
@@ -219,7 +246,8 @@
               overflow: hidden;
 
               @media (max-width: 768px) {
-                font-size: 1.1rem;
+                font-size: 1rem;
+                margin: 0 0 0.25rem;
               }
             }
 
@@ -228,6 +256,10 @@
               align-items: center;
               gap: 0.5rem;
               font-size: 0.9rem;
+
+              @media (max-width: 768px) {
+                font-size: 0.85rem;
+              }
 
               .card-year {
                 color: rgba(255, 255, 255, 0.6);
@@ -252,7 +284,12 @@
             margin: 0;
 
             @media (max-width: 768px) {
-              font-size: 0.9rem;
+              font-size: 0.85rem;
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
             }
           }
         }
