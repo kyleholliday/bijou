@@ -198,7 +198,12 @@ const TVDetail = () => {
                 {getRating(show) && (
                   <>
                     <span className="meta-divider">•</span>
-                    <span className="meta-item">{getRating(show)}</span>
+                    <span
+                      className="meta-item certification-badge"
+                      data-cert={getRating(show)}
+                    >
+                      {getRating(show)}
+                    </span>
                   </>
                 )}
               </p>
