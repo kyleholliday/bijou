@@ -9,6 +9,92 @@
     position: relative;
     z-index: 10;
 
+    // Back Navigation Button
+    .back-navigation {
+      margin-right: 1.5rem;
+
+      .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.2);
+          transform: translateX(-4px);
+        }
+
+        svg {
+          transition: transform 0.2s ease;
+        }
+
+        &:hover svg {
+          transform: translateX(-2px);
+        }
+      }
+    }
+
+    // Season Selector Dropdown
+    .season-selector {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1rem 1.5rem;
+      background: #272F37;
+      border-radius: 12px;
+
+      label {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin: 0;
+      }
+
+      .season-dropdown {
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 180px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #ffa500;
+          box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.1);
+        }
+
+        option {
+          background: #1a1a1a;
+          color: #fff;
+          padding: 0.5rem;
+
+          &:disabled {
+            color: #666;
+          }
+        }
+      }
+    }
+
     .season-content-wrapper {
       display: flex;
       gap: 3rem;
@@ -65,10 +151,86 @@
                 display: inline-block;
                 margin-bottom: 1rem;
                 font-size: 1.25rem;
+
+                .dot-seperator {
+                  font-weight: lighter;
+                }
+              }
+
+              .date-aired {
+                font-style: italic;
+                font-size: .85rem;
               }
 
               p:last-child {
                 margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Responsive styles
+    @media (max-width: 991px) {
+      .back-navigation {
+        margin-bottom: 1rem;
+
+        .back-button {
+          padding: 0.6rem 1rem;
+          font-size: 0.9rem;
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      .season-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+
+        .season-dropdown {
+          width: 100%;
+        }
+      }
+
+      .season-content-wrapper {
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .left-side {
+          flex: unset;
+          position: relative;
+          top: 0;
+          width: 100%;
+          max-width: 300px;
+          margin: 0 auto;
+        }
+
+        .right-side {
+          h1 {
+            font-size: 2rem;
+          }
+
+          .episodes-holder {
+            .episode {
+              flex-direction: column;
+              padding: 15px;
+              border-radius: 20px;
+
+              .episode-left {
+                img {
+                  width: 100%;
+                  margin-right: 0;
+                  margin-bottom: 15px;
+                }
+              }
+
+              .episode-right {
+                .episode-name {
+                  font-size: 1.1rem;
+                }
               }
             }
           }
