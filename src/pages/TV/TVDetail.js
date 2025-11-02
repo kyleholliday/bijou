@@ -244,8 +244,8 @@ const TVDetail = () => {
               </div>
             )}
             <div className="cast-crew-section">
-              <div className="tabs-nav">
-                {show.credits.cast.length > 0 && (
+              {show.credits.cast.length > 0 && (
+                <div className="tabs-nav">
                   <button
                     onClick={() => handleSectionClick('cast')}
                     className={`tab-button ${
@@ -254,8 +254,8 @@ const TVDetail = () => {
                   >
                     Cast
                   </button>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="tab-content">
                 {show.credits.cast.length > 0 && displaySection === 'cast' && (
@@ -286,6 +286,49 @@ const TVDetail = () => {
                   </div>
                 )}
               </div>
+            </div>
+            <div className="seasons tabs-nav">
+              <div className="tab-button active">Seasons</div>
+            </div>
+            <div>
+              {show.seasons.length > 0 && (
+                <div className="seasons-holder">
+                  {show.seasons
+                    .filter((season) => season.season_number !== 0)
+                    .map((season) => {
+                      // If season has no air date, show disabled with tooltip
+                      if (season.air_date == null) {
+                        return (
+                          <OverlayTrigger
+                            key={season.id}
+                            placement="top"
+                            overlay={
+                              <Tooltip id={`tooltip-season-${season.id}`}>
+                                Season not yet aired
+                              </Tooltip>
+                            }
+                            delay={{ show: 200, hide: 0 }}
+                          >
+                            <span className="season-links null">
+                              Season {season.season_number}
+                            </span>
+                          </OverlayTrigger>
+                        );
+                      }
+
+                      // Otherwise, render normal Link
+                      return (
+                        <Link
+                          to={`/season/${tvId}/${season.season_number}`}
+                          key={season.id}
+                          className="season-links"
+                        >
+                          Season {season.season_number}
+                        </Link>
+                      );
+                    })}
+                </div>
+              )}
             </div>
           </div>
         </div>

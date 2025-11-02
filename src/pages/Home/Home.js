@@ -12,7 +12,8 @@ const Home = () => {
   const [trendingTV, setTrendingTV] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const halloweenPicks = [575776, 913290, 1008042];
+  // const halloweenPicks = [575776, 913290, 1008042];
+  const thisYearsPicks = [1054867, 1233575, 648878];
 
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
@@ -94,10 +95,10 @@ const Home = () => {
       {/* <GenreQuickLinks /> */}
 
       <CuratedPicks
-        title="Modern Horror Hidden Gems"
-        description="Older movies not your style? Check out these staff picks for the spooky season - modern horror hits that you might have missed."
-        movieIds={halloweenPicks}
-        theme="halloween"
+        title="Favorites of the Year"
+        description="It's been a fantastic year at the movies. These are just a few of our favorites of the year (so far)."
+        movieIds={thisYearsPicks}
+        theme="dark"
       />
 
       <div className="home-content">

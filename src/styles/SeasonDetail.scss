@@ -1,0 +1,79 @@
+.season-detail-wrapper {
+  background: #14181C;
+  min-height: 100vh;
+  position: relative;
+  margin-top: 1rem;
+
+  .season-detail-container {
+    padding-bottom: 4rem;
+    position: relative;
+    z-index: 10;
+
+    .season-content-wrapper {
+      display: flex;
+      gap: 3rem;
+
+      .left-side {
+        flex: 0 0 300px;
+        position: sticky;
+        top: 2rem;
+        align-self: flex-start;
+
+        img {
+          border-radius: 12px;
+          box-shadow: 0 8px 32px #0009;
+          width: 100%;
+        }
+      }
+
+      .right-side {
+        color: #fff;
+        flex: 1 1;
+        min-width: 0;
+
+        h1 {
+          font-size: 3rem;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+          line-height: 1.1;
+          margin: 0 0 0.75rem;
+        }
+
+        .episodes-holder {
+          .episode {
+            display: flex;
+            background: #272F37;
+            color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 30px;
+
+            .episode-left {
+              position: relative;
+
+              img {
+                width: 300px;
+                height: auto;
+                border-radius: 10px;
+                margin-right: 20px;
+              }
+            }
+
+            .episode-right {
+              .episode-name {
+                font-weight: bold;
+                display: inline-block;
+                margin-bottom: 1rem;
+                font-size: 1.25rem;
+              }
+
+              p:last-child {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

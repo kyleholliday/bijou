@@ -12,6 +12,7 @@ import TVTrendingPage from './pages/TV/FullTrendingTV';
 import Person from './pages/Person/Person';
 import Footer from './components/Footer';
 import './styles/Variables.scss';
+import SeasonDetail from './pages/TV/SeasonDetail';
 
 function App() {
   return (
@@ -29,6 +30,10 @@ function App() {
           <Route path="/now-playing" element={<FullNowPlaying />} />
           <Route path="/upcoming" element={<FullUpcoming />} />
           <Route path="/tv-trending" element={<TVTrendingPage />} />
+          <Route
+            path="/season/:tvId/:seasonNumber"
+            element={<SeasonDetail />}
+          ></Route>
         </Routes>
       </div>
       <Footer />
