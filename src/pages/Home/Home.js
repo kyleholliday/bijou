@@ -13,7 +13,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   // const halloweenPicks = [575776, 913290, 1008042];
-  const thisYearsPicks = [1054867, 1233575, 648878];
+  const thisYearsPicks = [1233575, 696506, 1054867];
 
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
