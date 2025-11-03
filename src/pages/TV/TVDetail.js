@@ -177,9 +177,10 @@ const TVDetail = () => {
                       )}
                   </span>
                 )}
+                <span className="mobile-visible"></span>
                 {show.number_of_seasons && (
                   <>
-                    <span className="meta-divider">•</span>
+                    <span className="meta-divider hide-on-mobile">•</span>
                     <span className="meta-item">
                       {show.number_of_seasons} Season
                       {show.number_of_seasons !== 1 ? 's' : ''}
@@ -195,9 +196,10 @@ const TVDetail = () => {
                     </span>
                   </>
                 )}
+                <span className="mobile-visible"></span>
                 {getRating(show) && (
                   <>
-                    <span className="meta-divider">•</span>
+                    <span className="meta-divider hide-on-mobile">•</span>
                     <span
                       className="meta-item certification-badge"
                       data-cert={getRating(show)}

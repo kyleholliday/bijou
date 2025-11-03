@@ -166,8 +166,8 @@
   @media (max-width: 968px) {
     flex: none;
     position: static;
-    width: 100%;
-    max-width: 300px;
+    // width: 100%;
+    max-width: 90%;
     margin: 0 auto;
   }
 }
@@ -220,6 +220,12 @@
   flex: 1;
   color: #fff;
   min-width: 0;
+
+  @media(max-width:968px) {
+    max-width: 90%;
+    position: relative;
+    margin: 0 auto;
+  }
 }
 
 .movie-header {
@@ -246,6 +252,23 @@
   font-size: 1rem;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+
+  .mobile-visible {
+    display: none;
+
+    @media(max-width: 968px) {
+      width: 100%;
+      height: 0;
+      display: block;
+    }
+  }
+
+  @media (max-width: 968px) {
+    .hide-on-mobile {
+      display: none;
+    }
+  }
 
   .meta-item {
 
