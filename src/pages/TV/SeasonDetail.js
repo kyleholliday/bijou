@@ -99,24 +99,26 @@ const SeasonDetail = () => {
                 Back to {showInfo.name}
               </button>
             </div>
-            <label htmlFor="season-dropdown">Jump to Season:</label>
-            <select
-              id="season-dropdown"
-              value={seasonNumber}
-              onChange={(e) => handleSeasonChange(e.target.value)}
-              className="season-dropdown"
-            >
-              {allSeasons.map((s) => (
-                <option
-                  key={s.id}
-                  value={s.season_number}
-                  disabled={!s.air_date}
-                >
-                  Season {s.season_number}
-                  {!s.air_date ? ' (Not Yet Aired)' : ''}
-                </option>
-              ))}
-            </select>
+            <div className="season-selector-right">
+              <label htmlFor="season-dropdown">Jump to Season:</label>
+              <select
+                id="season-dropdown"
+                value={seasonNumber}
+                onChange={(e) => handleSeasonChange(e.target.value)}
+                className="season-dropdown"
+              >
+                {allSeasons.map((s) => (
+                  <option
+                    key={s.id}
+                    value={s.season_number}
+                    disabled={!s.air_date}
+                  >
+                    Season {s.season_number}
+                    {!s.air_date ? ' (Not Yet Aired)' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         )}
 

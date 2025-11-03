@@ -11,7 +11,8 @@ const formatDate = (date) =>
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-      }).format(new Date(date))
+        timeZone: 'UTC',
+      }).format(new Date(date + 'T00:00:00Z'))
     : '';
 const getAge = (dob, deathday) => {
   if (!dob) return null;
@@ -27,6 +28,53 @@ const getAge = (dob, deathday) => {
 };
 const getImage = (path) =>
   path ? `https://image.tmdb.org/t/p/w500${path}` : '/sorry.png';
+
+// Consolidated sorting function
+const sortCredits = (credits, sortType, dateField) => {
+  const sorted = [...credits];
+
+  if (sortType === 'recent') {
+    sorted.sort((a, b) => {
+      // Items without dates go to the bottom
+      if (!a[dateField] && !b[dateField]) return 0;
+      if (!a[dateField]) return 1;
+      if (!b[dateField]) return -1;
+      return b[dateField].localeCompare(a[dateField]);
+    });
+  } else if (sortType === 'earliest') {
+    sorted.sort((a, b) => {
+      // Items without dates go to the bottom
+      if (!a[dateField] && !b[dateField]) return 0;
+      if (!a[dateField]) return 1;
+      if (!b[dateField]) return -1;
+      return a[dateField].localeCompare(b[dateField]);
+    });
+  } else {
+    // popularity - also sort by vote_count as a tiebreaker for better accuracy
+    sorted.sort((a, b) => {
+      const popDiff = (b.popularity || 0) - (a.popularity || 0);
+      if (Math.abs(popDiff) < 0.01) {
+        return (b.vote_count || 0) - (a.vote_count || 0);
+      }
+      return popDiff;
+    });
+  }
+
+  return sorted;
+};
+
+// Process and deduplicate credits
+const processCredits = (rawCredits, filterFn) => {
+  const filtered = rawCredits.filter(filterFn);
+  const seen = new Set();
+
+  return filtered.filter((credit) => {
+    const key = `${credit.media_type}-${credit.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
 
 // Main Component
 const Person = () => {
@@ -62,7 +110,8 @@ const Person = () => {
         const details = detailsRes.data;
 
         // Process ACTING credits
-        const rawActing = creditsRes.data.cast.filter(
+        const actingCredits = processCredits(
+          creditsRes.data.cast,
           (c) =>
             c.character?.trim() &&
             !/presenter/i.test(c.character) &&
@@ -70,43 +119,23 @@ const Person = () => {
             !c.adult
         );
 
-        const seenActing = new Set();
-        const actingCredits = rawActing.filter((credit) => {
-          const key = `${credit.media_type}-${credit.id}`;
-          if (seenActing.has(key)) return false;
-          seenActing.add(key);
-          return true;
-        });
-
         // Process DIRECTING credits
-        const rawDirecting = creditsRes.data.crew.filter(
+        const directingCredits = processCredits(
+          creditsRes.data.crew,
           (c) => c.job?.toLowerCase() === 'director' && !c.adult
         );
 
-        const seenDirecting = new Set();
-        const directingCredits = rawDirecting.filter((credit) => {
-          const key = `${credit.media_type}-${credit.id}`;
-          if (seenDirecting.has(key)) return false;
-          seenDirecting.add(key);
-          return true;
-        });
-
         // Split by media type
-        const actingMovies = actingCredits
-          .filter((c) => c.media_type === 'movie')
-          .sort((a, b) => b.popularity - a.popularity);
-
-        const actingTV = actingCredits
-          .filter((c) => c.media_type === 'tv')
-          .sort((a, b) => b.popularity - a.popularity);
-
-        const directingMovies = directingCredits
-          .filter((c) => c.media_type === 'movie')
-          .sort((a, b) => b.popularity - a.popularity);
-
-        const directingTV = directingCredits
-          .filter((c) => c.media_type === 'tv')
-          .sort((a, b) => b.popularity - a.popularity);
+        const actingMovies = actingCredits.filter(
+          (c) => c.media_type === 'movie'
+        );
+        const actingTV = actingCredits.filter((c) => c.media_type === 'tv');
+        const directingMovies = directingCredits.filter(
+          (c) => c.media_type === 'movie'
+        );
+        const directingTV = directingCredits.filter(
+          (c) => c.media_type === 'tv'
+        );
 
         setData({
           details,
@@ -120,11 +149,9 @@ const Person = () => {
 
         // Auto-select first available tab
         if (isActorRoute) {
-          if (actingMovies.length) setPrimaryTab('movies');
-          else if (actingTV.length) setPrimaryTab('tv');
+          setPrimaryTab(actingMovies.length ? 'movies' : 'tv');
         } else if (isDirectorRoute) {
-          if (directingMovies.length) setPrimaryTab('movies');
-          else if (directingTV.length) setPrimaryTab('tv');
+          setPrimaryTab(directingMovies.length ? 'movies' : 'tv');
         }
       } catch (err) {
         console.error('Fetch error:', err);
@@ -134,66 +161,26 @@ const Person = () => {
     fetchPersonData();
   }, [personId, isActorRoute, isDirectorRoute]);
 
-  // Sorting (memoized)
-  const sortedActingMovies = useMemo(() => {
-    if (!data?.actingMovies) return [];
-    const arr = [...data.actingMovies];
-    if (movieSort === 'recent')
-      arr.sort((a, b) =>
-        (b.release_date || '').localeCompare(a.release_date || '')
-      );
-    else if (movieSort === 'earliest')
-      arr.sort((a, b) =>
-        (a.release_date || '').localeCompare(b.release_date || '')
-      );
-    else arr.sort((a, b) => b.popularity - a.popularity);
-    return arr;
-  }, [data, movieSort]);
+  // Consolidated sorting with useMemo
+  const sortedActingMovies = useMemo(
+    () => sortCredits(data?.actingMovies || [], movieSort, 'release_date'),
+    [data?.actingMovies, movieSort]
+  );
 
-  const sortedActingTV = useMemo(() => {
-    if (!data?.actingTV) return [];
-    const arr = [...data.actingTV];
-    if (tvSort === 'recent')
-      arr.sort((a, b) =>
-        (b.first_air_date || '').localeCompare(a.first_air_date || '')
-      );
-    else if (tvSort === 'earliest')
-      arr.sort((a, b) =>
-        (a.first_air_date || '').localeCompare(b.first_air_date || '')
-      );
-    else arr.sort((a, b) => b.popularity - a.popularity);
-    return arr;
-  }, [data, tvSort]);
+  const sortedActingTV = useMemo(
+    () => sortCredits(data?.actingTV || [], tvSort, 'first_air_date'),
+    [data?.actingTV, tvSort]
+  );
 
-  const sortedDirectingMovies = useMemo(() => {
-    if (!data?.directingMovies) return [];
-    const arr = [...data.directingMovies];
-    if (movieSort === 'recent')
-      arr.sort((a, b) =>
-        (b.release_date || '').localeCompare(a.release_date || '')
-      );
-    else if (movieSort === 'earliest')
-      arr.sort((a, b) =>
-        (a.release_date || '').localeCompare(b.release_date || '')
-      );
-    else arr.sort((a, b) => b.popularity - a.popularity);
-    return arr;
-  }, [data, movieSort]);
+  const sortedDirectingMovies = useMemo(
+    () => sortCredits(data?.directingMovies || [], movieSort, 'release_date'),
+    [data?.directingMovies, movieSort]
+  );
 
-  const sortedDirectingTV = useMemo(() => {
-    if (!data?.directingTV) return [];
-    const arr = [...data.directingTV];
-    if (tvSort === 'recent')
-      arr.sort((a, b) =>
-        (b.first_air_date || '').localeCompare(a.first_air_date || '')
-      );
-    else if (tvSort === 'earliest')
-      arr.sort((a, b) =>
-        (a.first_air_date || '').localeCompare(b.first_air_date || '')
-      );
-    else arr.sort((a, b) => b.popularity - a.popularity);
-    return arr;
-  }, [data, tvSort]);
+  const sortedDirectingTV = useMemo(
+    () => sortCredits(data?.directingTV || [], tvSort, 'first_air_date'),
+    [data?.directingTV, tvSort]
+  );
 
   if (!data)
     return (
@@ -331,8 +318,6 @@ const Person = () => {
                   items={primaryMovies}
                   sortType={movieSort}
                   onSort={setMovieSort}
-                  getReleaseYear={getReleaseYear}
-                  getImage={getImage}
                   linkBase="/movie"
                 />
               )}
@@ -347,8 +332,6 @@ const Person = () => {
                   items={primaryTV}
                   sortType={tvSort}
                   onSort={setTvSort}
-                  getReleaseYear={getReleaseYear}
-                  getImage={getImage}
                   linkBase="/show"
                 />
               )}
@@ -371,50 +354,22 @@ const Person = () => {
 
             <div className="credits-grid">
               {secondaryMovies.map((item, index) => (
-                <Link
-                  to={`/movie/${item.id}`}
+                <CreditCard
                   key={`secondary-movie-${item.id}-${index}`}
-                  className="credit-card"
-                >
-                  <div className="card-poster">
-                    <img
-                      src={getImage(item.poster_path)}
-                      alt={item.title}
-                      className={item.poster_path ? '' : 'fallback'}
-                    />
-                    <div className="overlay">
-                      <p className="overlay-text">{item.title}</p>
-                      {item.release_date && (
-                        <p className="overlay-text">
-                          {getReleaseYear(item.release_date)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </Link>
+                  item={item}
+                  linkTo={`/movie/${item.id}`}
+                  title={item.title}
+                  date={item.release_date}
+                />
               ))}
               {secondaryTV.map((item, index) => (
-                <Link
-                  to={`/show/${item.id}`}
+                <CreditCard
                   key={`secondary-tv-${item.id}-${index}`}
-                  className="credit-card"
-                >
-                  <div className="card-poster">
-                    <img
-                      src={getImage(item.poster_path)}
-                      alt={item.name}
-                      className={item.poster_path ? '' : 'fallback'}
-                    />
-                    <div className="overlay">
-                      <p className="overlay-text">{item.name}</p>
-                      {item.first_air_date && (
-                        <p className="overlay-text">
-                          {getReleaseYear(item.first_air_date)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </Link>
+                  item={item}
+                  linkTo={`/show/${item.id}`}
+                  title={item.name}
+                  date={item.first_air_date}
+                />
               ))}
             </div>
           </div>
@@ -424,15 +379,24 @@ const Person = () => {
   );
 };
 
-const CreditsGrid = ({
-  title,
-  items,
-  sortType,
-  onSort,
-  getReleaseYear,
-  getImage,
-  linkBase,
-}) => (
+// Extracted CreditCard component to reduce duplication
+const CreditCard = ({ item, linkTo, title, date }) => (
+  <Link to={linkTo} className="credit-card">
+    <div className="card-poster">
+      <img
+        src={getImage(item.poster_path)}
+        alt={title}
+        className={item.poster_path ? '' : 'fallback'}
+      />
+      <div className="overlay">
+        <p className="overlay-text">{title}</p>
+        {date && <p className="overlay-text">{getReleaseYear(date)}</p>}
+      </div>
+    </div>
+  </Link>
+);
+
+const CreditsGrid = ({ title, items, sortType, onSort, linkBase }) => (
   <div className="credits-content">
     <div className="content-header">
       <h2 className="content-title">{title}</h2>
@@ -446,7 +410,7 @@ const CreditsGrid = ({
               onClick={() => onSort(s)}
             >
               {s === 'popularity'
-                ? 'Popularity'
+                ? 'Most Popular'
                 : s === 'recent'
                 ? 'Newest'
                 : 'Earliest'}
@@ -458,27 +422,13 @@ const CreditsGrid = ({
 
     <div className="credits-grid">
       {items.map((item, index) => (
-        <Link
-          to={`${linkBase}/${item.id}`}
+        <CreditCard
           key={`${item.media_type || linkBase}-${item.id}-${index}`}
-          className="credit-card"
-        >
-          <div className="card-poster">
-            <img
-              src={getImage(item.poster_path)}
-              alt={item.title || item.name}
-              className={item.poster_path ? '' : 'fallback'}
-            />
-            <div className="overlay">
-              <p className="overlay-text">{item.title || item.name}</p>
-              {(item.release_date || item.first_air_date) && (
-                <p className="overlay-text">
-                  {getReleaseYear(item.release_date || item.first_air_date)}
-                </p>
-              )}
-            </div>
-          </div>
-        </Link>
+          item={item}
+          linkTo={`${linkBase}/${item.id}`}
+          title={item.title || item.name}
+          date={item.release_date || item.first_air_date}
+        />
       ))}
     </div>
   </div>
