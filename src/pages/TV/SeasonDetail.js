@@ -159,7 +159,7 @@ const SeasonDetail = () => {
             </div>
           </div>
           <div className="right-side">
-            <h1>{season.name}</h1>
+            <h1>Season {season.season_number}</h1>
             {season.air_date !== null ? (
               <>
                 <p>{season.overview}</p>

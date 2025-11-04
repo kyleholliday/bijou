@@ -88,6 +88,7 @@ const TVDetail = () => {
   };
 
   console.log(show);
+  console.log(usProviders);
 
   return (
     <div className="movie-detail-wrapper">

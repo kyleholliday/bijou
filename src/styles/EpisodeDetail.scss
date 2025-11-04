@@ -54,7 +54,7 @@
 
       @media (max-width: 991px) {
         flex-direction: column;
-        gap: 2rem;
+        gap: 0;
       }
 
       // Left Side - Episode Image
@@ -64,7 +64,7 @@
         @media (max-width: 991px) {
           flex: unset;
           width: 100%;
-          max-width: 600px;
+          // max-width: 600px;
           margin: 0 auto;
         }
 

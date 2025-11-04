@@ -71,18 +71,28 @@
 
     .result-poster img {
       transform: scale(1.05);
+
+      @media(max-width: 768px) {
+        transform: none;
+      }
     }
   }
 
   @media (max-width: 768px) {
     gap: 1rem;
     padding: 1rem;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transform: none;
+    }
   }
 
   @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+    flex-direction: row;
+    // align-items: center;
+    // text-align: center;
   }
 }
 
@@ -97,13 +107,13 @@
   @media (max-width: 768px) {
     flex: 0 0 100px;
     width: 100px;
-    height: 150px;
+    height: auto;
   }
 
   @media (max-width: 480px) {
     flex: 0 0 150px;
     width: 150px;
-    height: 225px;
+    height: auto;
   }
 
   img {
@@ -141,9 +151,9 @@
   gap: 0.75rem;
   flex-wrap: wrap;
 
-  @media (max-width: 480px) {
-    justify-content: center;
-  }
+  // @media (max-width: 480px) {
+  //   justify-content: center;
+  // }
 }
 
 .media-type-badge {

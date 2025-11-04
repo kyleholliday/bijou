@@ -8,6 +8,7 @@ const EpisodeDetail = () => {
   const navigate = useNavigate();
   const [episode, setEpisode] = useState(null);
   const [showInfo, setShowInfo] = useState(null);
+  const [episodeCast, setEpisodeCast] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -17,14 +18,17 @@ const EpisodeDetail = () => {
         const apiKey = process.env.REACT_APP_API_KEY;
         const episodeEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`;
         const showEndpoint = `https://api.themoviedb.org/3/tv/${tvId}`;
+        const creditsEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}/credits`;
 
-        const [episodeRes, showRes] = await Promise.all([
+        const [episodeRes, showRes, creditsRes] = await Promise.all([
           axios.get(episodeEndpoint, { params: { api_key: apiKey } }),
           axios.get(showEndpoint, { params: { api_key: apiKey } }),
+          axios.get(creditsEndpoint, { params: { api_key: apiKey } }),
         ]);
 
         setEpisode(episodeRes.data);
         setShowInfo(showRes.data);
+        setEpisodeCast(creditsRes.data.cast || []);
         document.title = `${episodeRes.data.name} - ${showRes.data.name}`;
       } catch (error) {
         console.error('Error fetching episode details', error);
@@ -138,11 +142,30 @@ const EpisodeDetail = () => {
 
             <p className="episode-overview">{episode.overview}</p>
 
+            {/* Episode Cast - Only actors in THIS episode */}
+            {episodeCast.length > 0 && (
+              <div className="cast-section">
+                <h3 className="section-label">Cast</h3>
+                <div className="cast-grid">
+                  {episodeCast.slice(0, 16).map((cast) => (
+                    <Link
+                      key={cast.id}
+                      to={`/actor/${cast.id}`}
+                      className="cast-badge"
+                    >
+                      {cast.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Guest Stars */}
             {episode.guest_stars && episode.guest_stars.length > 0 && (
               <div className="cast-section">
                 <h3 className="section-label">Guest Stars</h3>
                 <div className="cast-grid">
-                  {episode.guest_stars.slice(0, 20).map((guest) => (
+                  {episode.guest_stars.slice(0, 12).map((guest) => (
                     <Link
                       key={guest.id}
                       to={`/actor/${guest.id}`}
@@ -155,6 +178,7 @@ const EpisodeDetail = () => {
               </div>
             )}
 
+            {/* Crew */}
             {episode.crew && episode.crew.length > 0 && (
               <div className="crew-section">
                 <h3 className="section-label">Crew</h3>
