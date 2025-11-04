@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import '../../styles/SeasonDetail.scss';
 
 const SeasonDetail = () => {
@@ -79,7 +79,7 @@ const SeasonDetail = () => {
     <div className="season-detail-wrapper">
       <div className="container season-detail-container">
         {/* Season Selector */}
-        {allSeasons.length > 1 && (
+        {allSeasons.length > 1 ? (
           <div className="season-selector">
             {/* Back Button */}
             <div className="back-navigation">
@@ -120,6 +120,29 @@ const SeasonDetail = () => {
               </select>
             </div>
           </div>
+        ) : (
+          <div className="back-navigation">
+            <button
+              onClick={handleBackToShow}
+              className={`back-button ${
+                allSeasons.length <= 1 ? 'no-seasons' : ''
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+                />
+              </svg>
+              Back to {showInfo.name}
+            </button>
+          </div>
         )}
 
         <div className="season-content-wrapper">
@@ -143,7 +166,11 @@ const SeasonDetail = () => {
                 {season.episodes.length > 0 && (
                   <div className="episodes-holder">
                     {season.episodes.map((episode) => (
-                      <div className="episode" key={episode.id}>
+                      <Link
+                        to={`/season/${tvId}/${season.season_number}/${episode.episode_number}`}
+                        className="episode"
+                        key={episode.id}
+                      >
                         <div className="episode-left">
                           <img
                             src={
@@ -162,7 +189,7 @@ const SeasonDetail = () => {
                           <p>{formatDate(episode.air_date)}</p>
                           <p>{episode.overview}</p>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 )}

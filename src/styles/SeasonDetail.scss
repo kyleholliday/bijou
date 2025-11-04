@@ -13,6 +13,45 @@
     padding-left: 2rem;
     padding-right: 2rem;
 
+    .back-navigation {
+      margin: 0;
+
+      .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem 1.25rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.12);
+          border-color: rgba(255, 255, 255, 0.2);
+          transform: translateX(-3px);
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
+          transition: transform 0.25s ease;
+        }
+
+        &:hover svg {
+          transform: translateX(-2px);
+        }
+
+        &.no-seasons {
+          margin-bottom: 2rem;
+        }
+      }
+    }
+
     // Season Selector Bar - now horizontal and modern
     .season-selector {
       display: flex;
@@ -26,40 +65,7 @@
       border: 1px solid rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
 
-      .back-navigation {
-        margin: 0;
 
-        .back-button {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.6rem;
-          padding: 0.65rem 1.25rem;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-          color: #fff;
-          font-size: 0.95rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-          &:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateX(-3px);
-          }
-
-          svg {
-            width: 18px;
-            height: 18px;
-            transition: transform 0.25s ease;
-          }
-
-          &:hover svg {
-            transform: translateX(-2px);
-          }
-        }
-      }
 
       .season-selector-right {
         display: flex;
@@ -169,8 +175,10 @@
             color: #fff;
             padding: 1.5rem;
             border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
+            transition: background 0.5s ease-in-out;
             overflow: hidden;
+            text-decoration: none;
 
             &:hover {
               background: linear-gradient(135deg, rgba(39, 47, 55, 0.7) 0%, rgba(39, 47, 55, 0.5) 100%);
@@ -287,6 +295,7 @@
             .episode {
               flex-direction: column;
               padding: 1.25rem;
+              margin-bottom: 0.75rem;
 
               .episode-left {
                 img {

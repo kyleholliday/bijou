@@ -14,7 +14,7 @@
   overflow: hidden;
   background: #14181c;
   margin-top: -80px;
-  margin-bottom: -150px;
+  margin-bottom: -120px;
 
   @media (max-width: 968px) {
     height: 400px;
@@ -54,6 +54,7 @@
     right: 0;
     bottom: 0;
     pointer-events: none;
+    margin-bottom: -90px;
 
     .backdrop-gradient {
       content: "";
@@ -425,18 +426,21 @@
 .genre-badge {
   display: inline-block;
   padding: 0.5rem 1rem;
-  background: rgba(250, 173, 20, 0.1);
-  color: var(--main-yellow);
+  // background: rgba(250, 173, 20, 0.1);
+  background: rgba(59, 130, 246, 0.12);
+  // color: var(--main-yellow);
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
-  border: 1px solid rgba(250, 173, 20, 0.3);
-  transition: all 0.2s ease;
+  // border: 1px solid rgba(250, 173, 20, 0.3);
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  // transition: all 0.2s ease;
 
-  &:hover {
-    background: rgba(250, 173, 20, 0.2);
-    border-color: rgba(250, 173, 20, 0.5);
-  }
+  // &:hover {
+  //   background: rgba(250, 173, 20, 0.2);
+  //   border-color: rgba(250, 173, 20, 0.5);
+  // }
 }
 
 // Streaming Providers

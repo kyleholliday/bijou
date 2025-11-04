@@ -296,9 +296,19 @@ const TVDetail = () => {
               {show.seasons.length > 0 && (
                 <div className="seasons-holder">
                   {show.seasons
-                    .filter((season) => season.season_number !== 0)
+                    .filter(
+                      (season) =>
+                        season.season_number !== 0 ||
+                        season.name.toLowerCase().includes('special')
+                    )
                     .map((season) => {
-                      // If season has no air date, show disabled with tooltip
+                      // Determine the display name
+                      const isSpecial =
+                        season.season_number === 0 ||
+                        season.name.toLowerCase().includes('special');
+                      const displayName = isSpecial
+                        ? season.name
+                        : `Season ${season.season_number}`;
                       if (season.air_date == null) {
                         return (
                           <OverlayTrigger
@@ -312,20 +322,18 @@ const TVDetail = () => {
                             delay={{ show: 200, hide: 0 }}
                           >
                             <span className="season-links null">
-                              Season {season.season_number}
+                              {displayName}
                             </span>
                           </OverlayTrigger>
                         );
                       }
-
-                      // Otherwise, render normal Link
                       return (
                         <Link
                           to={`/season/${tvId}/${season.season_number}`}
                           key={season.id}
                           className="season-links"
                         >
-                          Season {season.season_number}
+                          {displayName}
                         </Link>
                       );
                     })}

@@ -13,6 +13,7 @@ import Person from './pages/Person/Person';
 import Footer from './components/Footer';
 import './styles/Variables.scss';
 import SeasonDetail from './pages/TV/SeasonDetail';
+import EpisodeDetail from './pages/TV/EpisodeDetail';
 
 function App() {
   return (
@@ -33,6 +34,10 @@ function App() {
           <Route
             path="/season/:tvId/:seasonNumber"
             element={<SeasonDetail />}
+          ></Route>
+          <Route
+            path="/season/:tvId/:seasonNumber/:episodeNumber"
+            element={<EpisodeDetail />}
           ></Route>
         </Routes>
       </div>

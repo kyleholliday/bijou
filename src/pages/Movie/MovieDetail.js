@@ -19,6 +19,7 @@ const MovieDetail = () => {
       const apiKey = process.env.REACT_APP_API_KEY;
       const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Cvideos%2Crelease_dates`;
       const providersEndpoint = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers`;
+      console.log(endpoint);
 
       try {
         // Fetch movie details and providers in parallel
@@ -170,6 +171,19 @@ const MovieDetail = () => {
     movie?.credits?.crew?.filter(
       (crewMember) => crewMember.job?.toLowerCase() === job
     ) || [];
+
+  const filterStoryCredits = () => {
+    const storyJobs = [
+      'Story',
+      'Original Story',
+      'Novel',
+      'Book',
+      'Author',
+      'Comic Book',
+      'Characters',
+    ];
+    return movie?.credits?.crew?.filter((c) => storyJobs.includes(c.job)) || [];
+  };
 
   if (!movie) {
     return (
@@ -490,6 +504,18 @@ const MovieDetail = () => {
                                 </span>
                               )
                             )}
+                          </div>
+                        </div>
+                      )}
+                      {filterStoryCredits().length > 0 && (
+                        <div className="crew-category">
+                          <p className="crew-role">Story By</p>
+                          <div className="crew-names">
+                            {filterStoryCredits().map((credit) => (
+                              <span key={credit.id} className="crew-name">
+                                {credit.name}
+                              </span>
+                            ))}
                           </div>
                         </div>
                       )}

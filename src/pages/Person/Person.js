@@ -410,7 +410,7 @@ const CreditsGrid = ({ title, items, sortType, onSort, linkBase }) => (
               onClick={() => onSort(s)}
             >
               {s === 'popularity'
-                ? 'Most Popular'
+                ? 'Popularity'
                 : s === 'recent'
                 ? 'Newest'
                 : 'Earliest'}
