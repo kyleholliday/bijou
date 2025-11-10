@@ -1,6 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react'; // Add useRef
 import axios from 'axios';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import {
+  Link,
+  useParams,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom';
 import '../../styles/Person.scss';
 
 // Utilities
@@ -82,16 +87,48 @@ const Person = () => {
   const location = useLocation();
   const [data, setData] = useState(null);
   const [showFullBio, setShowFullBio] = useState(false);
-  const [primaryTab, setPrimaryTab] = useState('movies');
-  const [movieSort, setMovieSort] = useState('popularity');
-  const [tvSort, setTvSort] = useState('popularity');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [primaryTab, setPrimaryTab] = useState(
+    searchParams.get('tab') || 'movies'
+  );
+  const [movieSort, setMovieSort] = useState(
+    searchParams.get('movieSort') || 'popularity'
+  );
+  const [tvSort, setTvSort] = useState(
+    searchParams.get('tvSort') || 'popularity'
+  );
 
   const isActorRoute = location.pathname.includes('/actor/');
   const isDirectorRoute = location.pathname.includes('/director/');
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
+  // const prevPersonIdRef = useRef(personId);
 
+  // Update URL and state together
+  const updateSort = (type, value) => {
+    const key = type === 'movie' ? 'movieSort' : 'tvSort';
+    const setter = type === 'movie' ? setMovieSort : setTvSort;
+
+    setter(value);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set(key, value);
+    setSearchParams(newParams, { preventScrollReset: true });
+  };
+
+  const updateTab = (tab) => {
+    setPrimaryTab(tab);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', tab);
+    setSearchParams(newParams, { preventScrollReset: true });
+  };
+
+  // useEffect(() => {
+  //   if (prevPersonIdRef.current !== personId) {
+  //     window.scrollTo(0, 0);
+  //     prevPersonIdRef.current = personId;
+  //   }
+  // }, [personId]);
+
+  useEffect(() => {
     const fetchPersonData = async () => {
       const apiKey = process.env.REACT_APP_API_KEY;
       const detailsUrl = `https://api.themoviedb.org/3/person/${personId}`;
@@ -116,8 +153,11 @@ const Person = () => {
             c.character?.trim() &&
             !/presenter/i.test(c.character) &&
             ![10763, 10767].some((g) => c.genre_ids?.includes(g)) &&
+            c.character.toLowerCase() !== 'self' &&
             !c.adult
         );
+
+        console.log(actingCredits);
 
         // Process DIRECTING credits
         const directingCredits = processCredits(
@@ -148,10 +188,25 @@ const Person = () => {
         document.title = details.name;
 
         // Auto-select first available tab
-        if (isActorRoute) {
-          setPrimaryTab(actingMovies.length ? 'movies' : 'tv');
-        } else if (isDirectorRoute) {
-          setPrimaryTab(directingMovies.length ? 'movies' : 'tv');
+        // Auto-select first available tab ONLY if no tab in URL
+        if (!searchParams.get('tab')) {
+          if (isActorRoute) {
+            const defaultTab = actingMovies.length ? 'movies' : 'tv';
+            setPrimaryTab(defaultTab);
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set('tab', defaultTab);
+            setSearchParams(newParams, {
+              replace: true,
+            });
+          } else if (isDirectorRoute) {
+            const defaultTab = directingMovies.length ? 'movies' : 'tv';
+            setPrimaryTab(defaultTab);
+            const newParams = new URLSearchParams(searchParams);
+            newParams.set('tab', defaultTab);
+            setSearchParams(newParams, {
+              replace: true,
+            });
+          }
         }
       } catch (err) {
         console.error('Fetch error:', err);
@@ -293,7 +348,7 @@ const Person = () => {
                     className={`tab-btn ${
                       primaryTab === 'movies' ? 'active' : ''
                     }`}
-                    onClick={() => setPrimaryTab('movies')}
+                    onClick={() => updateTab('movies')}
                   >
                     <span className="tab-label">Movies</span>
                     <span className="tab-count">{primaryMovies.length}</span>
@@ -302,7 +357,7 @@ const Person = () => {
                 {primaryTV.length > 0 && (
                   <button
                     className={`tab-btn ${primaryTab === 'tv' ? 'active' : ''}`}
-                    onClick={() => setPrimaryTab('tv')}
+                    onClick={() => updateTab('tv')}
                   >
                     <span className="tab-label">TV Shows</span>
                     <span className="tab-count">{primaryTV.length}</span>
@@ -317,7 +372,7 @@ const Person = () => {
                   }
                   items={primaryMovies}
                   sortType={movieSort}
-                  onSort={setMovieSort}
+                  onSort={(sort) => updateSort('movie', sort)}
                   linkBase="/movie"
                 />
               )}
@@ -331,7 +386,7 @@ const Person = () => {
                   }
                   items={primaryTV}
                   sortType={tvSort}
-                  onSort={setTvSort}
+                  onSort={(sort) => updateSort('tv', sort)}
                   linkBase="/show"
                 />
               )}

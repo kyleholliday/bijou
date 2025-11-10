@@ -13,8 +13,6 @@ const MovieDetail = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-
     const fetchMovieData = async () => {
       const apiKey = process.env.REACT_APP_API_KEY;
       const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Cvideos%2Crelease_dates`;

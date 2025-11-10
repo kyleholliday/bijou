@@ -10,12 +10,14 @@ const Home = () => {
   const [nowPlaying, setNowPlaying] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
   const [trendingTV, setTrendingTV] = useState([]);
+  // const [popularTV, setPopularTV] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // const halloweenPicks = [575776, 913290, 1008042];
-  const thisYearsPicks = [1233575, 696506, 1054867];
+  const thisYearsPicks = [1233575, 1054867, 1242898];
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const apiKey = process.env.REACT_APP_API_KEY;
 
     // Fetch Now Playing
@@ -77,6 +79,23 @@ const Home = () => {
       .catch((error) => {
         console.error('Error fetching the Trending TV Shows:', error);
       });
+
+    // Fetch Popular TV
+    // const popularTVEndpoint = 'https://api.themoviedb.org/3/tv/popular';
+    // axios
+    //   .get(popularTVEndpoint, {
+    //     params: {
+    //       api_key: apiKey,
+    //       language: 'en-US',
+    //       region: 'US',
+    //     },
+    //   })
+    //   .then((response) => {
+    //     setPopularTV(response.data.results.slice(0, 12));
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error fetching the Popular TV Shows:', error);
+    //   });
   }, []);
 
   if (loading) {
@@ -111,6 +130,8 @@ const Home = () => {
           />
         )}
 
+        <div className="divider"></div>
+
         {upcoming.length > 0 && (
           <HorizontalScrollSection
             title="Upcoming"
@@ -120,6 +141,8 @@ const Home = () => {
           />
         )}
 
+        <div className="divider"></div>
+
         {trendingTV.length > 0 && (
           <HorizontalScrollSection
             title="Trending TV"
@@ -128,6 +151,17 @@ const Home = () => {
             seeAllLink="/tv-trending"
           />
         )}
+
+        {/* <div className="divider"></div>
+
+        {popularTV.length > 0 && (
+          <HorizontalScrollSection
+            title="Popular TV"
+            items={popularTV}
+            type="show"
+            seeAllLink="/tv-trending"
+          />
+        )} */}
       </div>
     </div>
   );

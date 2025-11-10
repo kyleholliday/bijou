@@ -11,10 +11,11 @@
     }
   }
 }
-// .section-spacer {
-//   height: 2rem;
 
-//   @media (max-width: 768px) {
-//     height: 2rem;
-//   }
-// }
+.divider {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  max-width: 90%;
+  margin: 0 auto;
+  position: relative;
+  margin-bottom: 2rem;
+}

@@ -104,7 +104,11 @@ const SearchResults = () => {
                   <div className="result-content">
                     <h2 className="result-title">{title}</h2>
                     <div className="result-meta">
-                      <span className="media-type-badge">
+                      <span
+                        className={`media-type-badge ${
+                          isMovie ? 'movie-badge' : 'tv-badge'
+                        }`}
+                      >
                         {isMovie ? 'Movie' : 'TV Show'}
                       </span>
                       {year && <span className="result-year">{year}</span>}

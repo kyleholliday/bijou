@@ -19,8 +19,8 @@ function App() {
   return (
     <div className="App">
       <Navbar />
-      <ScrollToTop />
       <div className="main">
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/movie/:movieId" element={<MovieDetail />} />
@@ -34,11 +34,11 @@ function App() {
           <Route
             path="/season/:tvId/:seasonNumber"
             element={<SeasonDetail />}
-          ></Route>
+          />
           <Route
             path="/season/:tvId/:seasonNumber/:episodeNumber"
             element={<EpisodeDetail />}
-          ></Route>
+          />
         </Routes>
       </div>
       <Footer />
