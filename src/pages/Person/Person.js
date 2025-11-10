@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react'; // Add useRef
+import { useEffect, useState, useMemo } from 'react'; // Add useRef
 import axios from 'axios';
 import {
   Link,
@@ -101,8 +101,6 @@ const Person = () => {
   const isActorRoute = location.pathname.includes('/actor/');
   const isDirectorRoute = location.pathname.includes('/director/');
 
-  // const prevPersonIdRef = useRef(personId);
-
   // Update URL and state together
   const updateSort = (type, value) => {
     const key = type === 'movie' ? 'movieSort' : 'tvSort';
@@ -120,13 +118,6 @@ const Person = () => {
     newParams.set('tab', tab);
     setSearchParams(newParams, { preventScrollReset: true });
   };
-
-  // useEffect(() => {
-  //   if (prevPersonIdRef.current !== personId) {
-  //     window.scrollTo(0, 0);
-  //     prevPersonIdRef.current = personId;
-  //   }
-  // }, [personId]);
 
   useEffect(() => {
     const fetchPersonData = async () => {
@@ -216,7 +207,6 @@ const Person = () => {
     fetchPersonData();
   }, [personId, isActorRoute, isDirectorRoute]);
 
-  // Consolidated sorting with useMemo
   const sortedActingMovies = useMemo(
     () => sortCredits(data?.actingMovies || [], movieSort, 'release_date'),
     [data?.actingMovies, movieSort]
