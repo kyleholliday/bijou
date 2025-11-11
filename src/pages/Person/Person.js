@@ -205,7 +205,7 @@ const Person = () => {
     };
 
     fetchPersonData();
-  }, [personId, isActorRoute, isDirectorRoute]);
+  }, [personId, isActorRoute, isDirectorRoute, searchParams, setSearchParams]);
 
   const sortedActingMovies = useMemo(
     () => sortCredits(data?.actingMovies || [], movieSort, 'release_date'),
