@@ -280,3 +280,43 @@
     display: none !important;
   }
 }
+
+// Auth button styles
+.auth-btn {
+  padding: 0.6rem 1rem;
+  background: rgba(250, 173, 20, 0.08);
+  color: #faad14;
+  border: 1px solid rgba(250, 173, 20, 0.25);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(250, 173, 20, 0.15);
+    border-color: rgba(250, 173, 20, 0.5);
+    color: #ffc107;
+  }
+}
+
+// Mobile auth link
+.mobile-navigation-link.auth-link {
+  margin-top: 0.5rem;
+  padding: 0.4rem 1rem;
+  text-align: center;
+  background: rgba(250, 173, 20, 0.1);
+  border: 1px solid rgba(250, 173, 20, 0.25);
+  border-radius: 8px;
+  color: #faad14;
+  font-weight: 500;
+
+  &:hover {
+    background: rgba(250, 173, 20, 0.15);
+    border-color: rgba(250, 173, 20, 0.5);
+    color: #ffc107;
+  }
+}

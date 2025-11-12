@@ -183,6 +183,11 @@
   }
 }
 
+.trailer-and-favorite {
+  display: flex;
+  gap: 1rem;
+}
+
 .trailer-button {
   display: flex;
   align-items: center;
@@ -213,6 +218,49 @@
   svg {
     width: 18px;
     height: 18px;
+  }
+}
+
+.favorite-button-standalone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  // margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+  }
+
+  &.favorited {
+    background: rgba(250, 173, 20, 0.12);
+    border-color: rgba(250, 173, 20, 0.4);
+    color: #faad14;
+
+    &:hover {
+      background: rgba(250, 173, 20, 0.18);
+      border-color: rgba(250, 173, 20, 0.6);
+      color: #ffc107;
+    }
+  }
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
   }
 }
 

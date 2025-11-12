@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { useFavorites } from '../../hooks/useFavorites';
+import { useAuth } from '../../contexts/AuthContext';
+import { motion } from 'framer-motion';
 import '../../styles/MovieDetail.scss';
 
 const MovieDetail = () => {
   const { movieId } = useParams();
+  const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [movie, setMovie] = useState(null);
   const [usProviders, setUsProviders] = useState(null);
   const [collection, setCollection] = useState(null);
@@ -232,25 +237,73 @@ const MovieDetail = () => {
                 className="poster-image"
               />
             </div>
-            {bestTrailer && (
-              <a
-                href={`https://www.youtube.com/watch?v=${bestTrailer.key}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="trailer-button"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  fill="currentColor"
-                  viewBox="0 0 16 16"
+            <div className="trailer-and-favorite">
+              {bestTrailer && (
+                <a
+                  href={`https://www.youtube.com/watch?v=${bestTrailer.key}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="trailer-button"
                 >
-                  <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
-                </svg>
-                Play Trailer
-              </a>
-            )}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" />
+                  </svg>
+                  Play Trailer
+                </a>
+              )}
+              {user && (
+                <motion.button
+                  onClick={() =>
+                    toggleFavorite(
+                      movie.id,
+                      'movie',
+                      movie.title,
+                      movie.poster_path
+                    )
+                  }
+                  className={`favorite-button-standalone ${
+                    isFavorite(movie.id) ? 'favorited' : ''
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label={
+                    isFavorite(movie.id)
+                      ? 'Remove from favorites'
+                      : 'Add to favorites'
+                  }
+                >
+                  <motion.svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill={isFavorite(movie.id) ? 'currentColor' : 'none'}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    initial={false}
+                    animate={
+                      isFavorite(movie.id)
+                        ? { scale: [1, 1.2, 1] }
+                        : { scale: 1 }
+                    }
+                    transition={{ duration: 0.3 }}
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </motion.svg>
+                  {/* <span>
+                    {isFavorite(movie.id) ? 'Favorited' : 'Add to Favorites'}
+                  </span> */}
+                </motion.button>
+              )}
+            </div>
             {/* Streaming Providers */}
             {usProviders?.flatrate && (
               <div className="providers-section">
@@ -272,7 +325,9 @@ const MovieDetail = () => {
           {/* Right Side - All Details */}
           <div className="details-section">
             <div className="movie-header">
-              <h1 className="movie-title">{movie.title}</h1>
+              <div className="title-with-favorite">
+                <h1 className="movie-title">{movie.title}</h1>
+              </div>
               <div className="movie-meta">
                 <span className="meta-item">
                   {getReleaseYear(movie.release_date)}

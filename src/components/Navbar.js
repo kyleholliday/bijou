@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/supabase';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/Navbar.scss';
@@ -8,6 +10,10 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+
+  const { user } = useAuth();
+
+  console.log('Current user:', user);
 
   const handleSearch = () => {
     if (searchTerm.trim() !== '') {
@@ -42,6 +48,11 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setMobileMenuOpen(false);
+  };
+
   return (
     <nav className="modern-navbar">
       <div className="navbar-container">
@@ -64,6 +75,11 @@ const Navbar = () => {
           <NavLink to="/tv-trending" className="navigation-link">
             Trending TV
           </NavLink>
+          {user && (
+            <NavLink to="/favorites" className="navigation-link">
+              Favorites
+            </NavLink>
+          )}
         </div>
 
         {/* Desktop Search */}
@@ -139,6 +155,15 @@ const Navbar = () => {
               )}
             </AnimatePresence>
           </button>
+          {user ? (
+            <button className="auth-btn" onClick={handleLogout}>
+              Log Out
+            </button>
+          ) : (
+            <NavLink to="/auth" className="auth-btn">
+              Log In
+            </NavLink>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -153,6 +178,22 @@ const Navbar = () => {
             <span></span>
           </span>
         </button>
+        {user ? (
+          <button
+            className="mobile-navigation-link auth-link mobile-menu-btn"
+            onClick={handleLogout}
+          >
+            Log Out
+          </button>
+        ) : (
+          <NavLink
+            to="/auth"
+            className="mobile-navigation-link auth-link mobile-menu-btn"
+            onClick={handleNavClick}
+          >
+            Log In
+          </NavLink>
+        )}
       </div>
 
       {/* Mobile Menu */}
@@ -195,6 +236,15 @@ const Navbar = () => {
               >
                 Trending TV
               </NavLink>
+              {user && (
+                <NavLink
+                  to="/favorites"
+                  className="mobile-navigation-link"
+                  onClick={handleNavClick}
+                >
+                  Favorites
+                </NavLink>
+              )}
 
               {/* Mobile Search */}
               <div className="mobile-search">
