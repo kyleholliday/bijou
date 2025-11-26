@@ -11,8 +11,6 @@ const EpisodeDetail = () => {
   const [episodeCast, setEpisodeCast] = useState([]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-
     async function fetchData() {
       try {
         const apiKey = process.env.REACT_APP_API_KEY;
@@ -69,8 +67,6 @@ const EpisodeDetail = () => {
   const handleBackToSeason = () => {
     navigate(`/season/${tvId}/${seasonNumber}`);
   };
-
-  console.log(episode);
 
   return (
     <div className="episode-detail-wrapper">

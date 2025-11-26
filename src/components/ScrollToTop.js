@@ -6,13 +6,11 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Scroll to the top of the window whenever the pathname changes
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
-  }, [pathname]); // Rerun the effect when pathname changes
+    // Use setTimeout to ensure it happens after render
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 0);
+  }, [pathname]);
 
   return null;
 };

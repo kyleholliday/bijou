@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import { supabase } from '../services/supabase';
 import './Auth.scss';
 
 function Auth() {
+  const navigate = useNavigate(); // Add this
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +26,9 @@ function Auth() {
         });
 
         if (error) throw error;
-        setMessage('Please check your email to finalize account creation');
+        setMessage('Account created successfully! You can now log in.');
+        setIsSignUp(false); // Switch to login mode
+        setPassword(''); // Clear password field
       } else {
         // Log in
         const { error } = await supabase.auth.signInWithPassword({
@@ -33,7 +37,9 @@ function Auth() {
         });
 
         if (error) throw error;
-        setMessage('Logged in successfully!');
+
+        // Redirect to home after successful login
+        navigate('/');
       }
     } catch (error) {
       setMessage(error.message);

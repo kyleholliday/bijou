@@ -5,6 +5,7 @@ import Backdrop from './Backdrop';
 import HorizontalScrollSection from '../../components/HorizontalScrollSection';
 import '../../styles/Home.scss';
 import CuratedPicks from '../../components/CuratedPicks';
+import { getCuratedContent } from '../../utils/curatedContent';
 
 const Home = () => {
   const [nowPlaying, setNowPlaying] = useState([]);
@@ -14,10 +15,9 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
 
   // const halloweenPicks = [575776, 913290, 1008042];
-  const thisYearsPicks = [1233575, 1054867, 1242898];
+  const curatedContent = getCuratedContent();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
     const apiKey = process.env.REACT_APP_API_KEY;
 
     // Fetch Now Playing
@@ -114,9 +114,9 @@ const Home = () => {
       {/* <GenreQuickLinks /> */}
 
       <CuratedPicks
-        title="Favorites of the Year"
-        description="It's been a fantastic year at the movies. These are just a few of our favorites of the year (so far)."
-        movieIds={thisYearsPicks}
+        title={curatedContent.title}
+        description={curatedContent.description}
+        movieIds={curatedContent.movieIds}
         theme="dark"
       />
 

@@ -100,8 +100,8 @@ const CuratedPicks = ({ title, description, movieIds, theme = 'dark' }) => {
 
                   {movie.overview && (
                     <p className="card-overview">
-                      {movie.overview.slice(0, 130)}
-                      {movie.overview.length > 130 && '...'}
+                      {movie.overview.slice(0, 120)}
+                      {movie.overview.length > 120 && '...'}
                     </p>
                   )}
                 </div>

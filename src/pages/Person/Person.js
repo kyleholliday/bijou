@@ -148,8 +148,6 @@ const Person = () => {
             !c.adult
         );
 
-        console.log(actingCredits);
-
         // Process DIRECTING credits
         const directingCredits = processCredits(
           creditsRes.data.crew,

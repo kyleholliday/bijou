@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, useInView } from 'framer-motion';
 import '../styles/HorizontalScrollSection.scss';
 
 const HorizontalScrollSection = ({
@@ -9,8 +10,12 @@ const HorizontalScrollSection = ({
   seeAllLink,
 }) => {
   const scrollContainerRef = useRef(null);
+  const sectionRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+
+  // Trigger when more of the section is visible
+  const isInView = useInView(sectionRef, { once: true, amount: 0.5 });
 
   const handleScroll = () => {
     const container = scrollContainerRef.current;
@@ -41,7 +46,7 @@ const HorizontalScrollSection = ({
   const getReleaseYear = (date) => (date ? date.split('-')[0] : 'TBD');
 
   return (
-    <section className="horizontal-scroll-section">
+    <section className="horizontal-scroll-section" ref={sectionRef}>
       <div className="section-header">
         <h2 className="section-title">{title}</h2>
         {seeAllLink && (
@@ -91,10 +96,13 @@ const HorizontalScrollSection = ({
           </button>
         )}
 
-        <div
+        <motion.div
           className="scroll-container"
           ref={scrollContainerRef}
           onScroll={handleScroll}
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           {items.map((item) => {
             const linkPath =
@@ -119,7 +127,7 @@ const HorizontalScrollSection = ({
               </Link>
             );
           })}
-        </div>
+        </motion.div>
 
         {showRightArrow && (
           <button

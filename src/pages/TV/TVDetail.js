@@ -93,7 +93,6 @@ const TVDetail = () => {
   };
 
   console.log(show);
-  console.log(usProviders);
 
   return (
     <div className="movie-detail-wrapper">
@@ -342,19 +341,8 @@ const TVDetail = () => {
               {show.seasons.length > 0 && (
                 <div className="seasons-holder">
                   {show.seasons
-                    .filter(
-                      (season) =>
-                        season.season_number !== 0 ||
-                        season.name.toLowerCase().includes('special')
-                    )
+                    .filter((season) => season.season_number > 0)
                     .map((season) => {
-                      // Determine the display name
-                      const isSpecial =
-                        season.season_number === 0 ||
-                        season.name.toLowerCase().includes('special');
-                      const displayName = isSpecial
-                        ? season.name
-                        : `Season ${season.season_number}`;
                       if (season.air_date == null) {
                         return (
                           <OverlayTrigger
@@ -368,7 +356,7 @@ const TVDetail = () => {
                             delay={{ show: 200, hide: 0 }}
                           >
                             <span className="season-links null">
-                              {displayName}
+                              Season {season.season_number}
                             </span>
                           </OverlayTrigger>
                         );
@@ -379,7 +367,7 @@ const TVDetail = () => {
                           key={season.id}
                           className="season-links"
                         >
-                          {displayName}
+                          Season {season.season_number}
                         </Link>
                       );
                     })}

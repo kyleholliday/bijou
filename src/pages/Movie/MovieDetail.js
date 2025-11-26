@@ -22,7 +22,6 @@ const MovieDetail = () => {
       const apiKey = process.env.REACT_APP_API_KEY;
       const endpoint = `https://api.themoviedb.org/3/movie/${movieId}?append_to_response=credits%2Cvideos%2Crelease_dates`;
       const providersEndpoint = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers`;
-      console.log(endpoint);
 
       try {
         // Fetch movie details and providers in parallel
@@ -44,7 +43,7 @@ const MovieDetail = () => {
 
         movieData.certification = certification;
         setMovie(movieData);
-        document.title = movieData.title;
+        document.title = `${movieData.title} • Bijou`;
 
         // Set initial display section
         if (movieData.credits?.cast?.length > 0) {

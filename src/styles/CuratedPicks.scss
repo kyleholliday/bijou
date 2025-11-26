@@ -141,7 +141,9 @@
 
       .curated-card {
         position: relative;
-        display: block;
+        display: flex; // Add this
+        flex-direction: column; // Add this
+        height: 100%; // Add this - makes card fill grid cell
         background: rgba(255, 255, 255, 0.03);
         border-radius: 16px;
         overflow: hidden;
@@ -216,6 +218,9 @@
           padding: 1.5rem;
           position: relative;
           background: #15181c91;
+          flex: 1; // Add this - makes content fill remaining space
+          display: flex; // Add this
+          flex-direction: column; // Add this
 
           // Mobile: adjust padding and flex grow
           @media (max-width: 768px) {
@@ -282,6 +287,7 @@
             line-height: 1.6;
             color: rgba(255, 255, 255, 0.65);
             margin: 0;
+            margin-top: auto;
 
             @media (max-width: 768px) {
               font-size: 0.85rem;

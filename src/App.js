@@ -3,8 +3,9 @@ import Auth from './components/Auth';
 import './App.scss';
 import Home from './pages/Home/Home';
 import ScrollToTop from './components/ScrollToTop';
+import Profile from './pages/Profile/Profile';
 import MovieDetail from './pages/Movie/MovieDetail';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom'; // Add BrowserRouter here
 import Navbar from './components/Navbar';
 import SearchResults from './pages/SearchResults/SearchResults';
 import FullNowPlaying from './pages/NowPlaying/FullNowPlaying';
@@ -25,10 +26,10 @@ function App() {
         <Navbar />
         <div className="main">
           <ScrollToTop />
-
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/movie/:movieId" element={<MovieDetail />} />
             <Route path="/show/:tvId" element={<TVDetail />} />
             <Route path="/actor/:personId" element={<Person />} />

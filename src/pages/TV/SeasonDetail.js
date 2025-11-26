@@ -11,8 +11,6 @@ const SeasonDetail = () => {
   const [allSeasons, setAllSeasons] = useState([]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-
     const fetchData = async () => {
       const apiKey = process.env.REACT_APP_API_KEY;
       const seasonEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?language=en-US`;
@@ -53,10 +51,6 @@ const SeasonDetail = () => {
       timeZone: 'UTC',
     }).format(date);
   };
-
-  console.log(tvId);
-  console.log(seasonNumber);
-  console.log(season);
 
   // Added loading state
   if (!season || !showInfo) {

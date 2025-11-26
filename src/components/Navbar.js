@@ -1,19 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../services/supabase';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../services/supabase';
 import '../styles/Navbar.scss';
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userAvatar, setUserAvatar] = useState(null);
   const navigate = useNavigate();
 
   const { user } = useAuth();
 
-  console.log('Current user:', user);
+  // Fetch user avatar when user changes
+  useEffect(() => {
+    const fetchUserAvatar = async () => {
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (data && data.avatar_url) {
+          setUserAvatar(data.avatar_url);
+        }
+      } catch (error) {
+        console.error('Error fetching avatar:', error);
+      }
+    };
+
+    if (user) {
+      fetchUserAvatar();
+    } else {
+      setUserAvatar(null);
+    }
+  }, [user]);
 
   const handleSearch = () => {
     if (searchTerm.trim() !== '') {
@@ -48,11 +72,6 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setMobileMenuOpen(false);
-  };
-
   return (
     <nav className="modern-navbar">
       <div className="navbar-container">
@@ -63,9 +82,6 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="navbar-links desktop">
-          {/* <NavLink to="/" className="navigation-link" end>
-            Home
-          </NavLink> */}
           <NavLink to="/now-playing" className="navigation-link">
             Now Playing
           </NavLink>
@@ -156,9 +172,25 @@ const Navbar = () => {
             </AnimatePresence>
           </button>
           {user ? (
-            <button className="auth-btn" onClick={handleLogout}>
-              Log Out
-            </button>
+            <NavLink to="/profile" className="profile-avatar-btn">
+              {userAvatar ? (
+                <img
+                  src={userAvatar}
+                  alt="Profile"
+                  className="navbar-avatar-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <span
+                className="navbar-avatar-letter"
+                style={{ display: userAvatar ? 'none' : 'flex' }}
+              >
+                {user.email.charAt(0).toUpperCase()}
+              </span>
+            </NavLink>
           ) : (
             <NavLink to="/auth" className="auth-btn">
               Log In
@@ -179,12 +211,13 @@ const Navbar = () => {
           </span>
         </button>
         {user ? (
-          <button
-            className="mobile-navigation-link auth-link mobile-menu-btn"
-            onClick={handleLogout}
+          <NavLink
+            to="/profile"
+            className="mobile-navigation-link profile-link mobile-menu-btn"
+            onClick={handleNavClick}
           >
-            Log Out
-          </button>
+            Profile
+          </NavLink>
         ) : (
           <NavLink
             to="/auth"

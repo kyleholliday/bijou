@@ -42,7 +42,6 @@ const TVTrendingPage = () => {
         setTotalPages(Math.ceil(uniqueShows.length / showsPerPage));
         document.title = 'Trending TV';
         setLoading(false);
-        console.log(uniqueShows);
       } catch (error) {
         console.error('Error fetching Trending TV shows:', error);
         setLoading(false);
@@ -53,7 +52,6 @@ const TVTrendingPage = () => {
   }, []);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
     const startIndex = (currentPage - 1) * showsPerPage;
     const endIndex = startIndex + showsPerPage;
     setShows(allShows.slice(startIndex, endIndex));

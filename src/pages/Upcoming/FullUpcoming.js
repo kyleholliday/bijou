@@ -64,7 +64,6 @@ const UpcomingMoviesPage = () => {
 
   // Update displayed movies when page changes
   useEffect(() => {
-    window.scrollTo(0, 0);
     const startIndex = (currentPage - 1) * moviesPerPage;
     const endIndex = startIndex + moviesPerPage;
     setMovies(allMovies.slice(startIndex, endIndex));
