@@ -15,7 +15,7 @@ export const getCuratedContent = () => {
   // Holiday Season (November 15 - December 31)
   if ((month === 10 && day >= 24) || month === 11) {
     return {
-      movieIds: [840430, 850, 10437],
+      movieIds: [850, 771, 840430],
       title: 'Holiday Classics',
       description:
         'Pour up some hot cocoa, toss another log on the fire, and cozy up with these heartwarming holiday favorites.',
