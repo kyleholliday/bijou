@@ -18,6 +18,7 @@ import './styles/Variables.scss';
 import SeasonDetail from './pages/TV/SeasonDetail';
 import EpisodeDetail from './pages/TV/EpisodeDetail';
 import Favorites from './pages/Favorites/Favorites';
+import MoviePicker from './pages/MoviePicker/MoviePicker';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             <Route path="/upcoming" element={<FullUpcoming />} />
             <Route path="/tv-trending" element={<TVTrendingPage />} />
             <Route path="/favorites" element={<Favorites />} />
+            <Route path="/movie-picker" element={<MoviePicker />} />
             <Route
               path="/season/:tvId/:seasonNumber"
               element={<SeasonDetail />}

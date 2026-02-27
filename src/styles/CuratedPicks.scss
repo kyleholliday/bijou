@@ -13,7 +13,6 @@
     padding: 5rem 1rem 8rem;
   }
 
-  // Theme variations
   &.dark {
     background: linear-gradient(180deg,
         #14181C 0%,
@@ -28,7 +27,6 @@
         rgba(20, 10, 10, 0.8) 100%);
   }
 
-  // Background accent
   &::before {
     content: '';
     position: absolute;
@@ -130,13 +128,20 @@
     }
 
     .curated-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      display: flex;
       gap: 2rem;
 
       @media (max-width: 768px) {
-        grid-template-columns: 1fr;
         gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .grid-insider {
+        flex-basis: 33.33%;
+
+        @media(max-width:768px) {
+          flex-basis: 100%;
+        }
       }
 
       .curated-card {
@@ -152,6 +157,7 @@
         border: 2px solid rgba(255, 255, 255, 0.08);
         transition: all 0.3s ease;
         backdrop-filter: blur(10px);
+        flex-basis: 33.33%;
 
         // Mobile: horizontal layout
         @media (max-width: 768px) {
@@ -171,10 +177,6 @@
           .card-image {
             transform: scale(1.05);
           }
-
-          // .card-gradient {
-          //   opacity: 0.8;
-          // }
         }
 
         .card-image-wrapper {
@@ -292,8 +294,8 @@
             @media (max-width: 768px) {
               font-size: 0.85rem;
               display: -webkit-box;
-              -webkit-line-clamp: 3;
-              line-clamp: 3;
+              -webkit-line-clamp: 4;
+              line-clamp: 4;
               -webkit-box-orient: vertical;
               overflow: hidden;
             }

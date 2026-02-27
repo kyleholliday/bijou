@@ -66,6 +66,7 @@ const CuratedPicks = ({ title, description, movieIds, theme = 'dark' }) => {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
+              className="grid-insider"
             >
               <Link to={`/movie/${movie.id}`} className="curated-card">
                 <div className="card-image-wrapper">

@@ -91,6 +91,9 @@ const Navbar = () => {
           <NavLink to="/tv-trending" className="navigation-link">
             Trending TV
           </NavLink>
+          {/* <NavLink to="/movie-picker" className="navigation-link">
+            Movie Picker
+          </NavLink> */}
           {user && (
             <NavLink to="/favorites" className="navigation-link">
               Favorites
@@ -268,6 +271,13 @@ const Navbar = () => {
                 onClick={handleNavClick}
               >
                 Trending TV
+              </NavLink>
+              <NavLink
+                to="/movie-picker"
+                className="mobile-navigation-link"
+                onClick={handleNavClick}
+              >
+                Movie Picker
               </NavLink>
               {user && (
                 <NavLink

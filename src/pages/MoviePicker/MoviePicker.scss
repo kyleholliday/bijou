@@ -1,0 +1,237 @@
+/* MoviePicker.scss */
+
+.movie-picker {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    color: #e5e5e5;
+  }
+
+  .filter-group {
+    margin-bottom: 2rem;
+  }
+
+  .filter-group label {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    color: #e5e5e5;
+  }
+
+  .label-hint {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #999;
+    margin-left: 0.5rem;
+  }
+
+  /* Button Grid (for genres - wraps to multiple rows) */
+  .button-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* Button Group (for decade/runtime/mood - single row) */
+  .button-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .button-grid button,
+  .button-group button {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #e5e5e5;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+
+  .button-grid button:hover:not(:disabled),
+  .button-group button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .button-grid button.active,
+  .button-group button.active {
+    background: rgba(13, 110, 253, 0.8);
+    border-color: #0d6efd;
+    color: white;
+  }
+
+  .button-grid button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Find Button */
+  .find-button {
+    padding: 1rem 3rem;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 1rem;
+  }
+
+  .find-button:hover:not(:disabled) {
+    background: #0b5ed7;
+  }
+
+  .find-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Results */
+  .results {
+    margin-top: 3rem;
+  }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .results-header h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #e5e5e5;
+  }
+
+  .results-header button {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #e5e5e5;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+
+  .results-header button:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Movie Grid */
+  .movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  /* Movie Card */
+  .movie-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .movie-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .movie-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .movie-info {
+    padding: 1.5rem;
+  }
+
+  .movie-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #e5e5e5;
+  }
+
+  .movie-info .year,
+  .movie-info .rating {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 0.25rem;
+  }
+
+  .movie-info .rating {
+    color: #ffd700;
+  }
+
+  .movie-info .overview {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #ccc;
+    display: -webkit-box;
+    line-clamp: 4;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+.image-placeholder {
+  width: 100%;
+  aspect-ratio: 2/3;
+  background: rgba(255, 255, 255, 0.1);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .movie-picker {
+    padding: 1rem;
+  }
+
+  .movie-picker h1 {
+    font-size: 2rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-grid button,
+  .button-group button {
+    width: 100%;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -34,7 +34,7 @@ export const getCuratedContent = () => {
   // Spring/Awards Season (February 1 - March 31)
   if (month >= 1 && month <= 2) {
     return {
-      movieIds: [533535, 823464, 748783],
+      movieIds: [1054867, 858024, 1233413],
       title: 'Awards Season Favorites',
       description:
         "Celebrating the films that defined this year's awards season.",
