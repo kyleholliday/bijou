@@ -32,20 +32,18 @@ export const getCuratedContent = () => {
   }
 
   // Spring/Awards Season (February 1 - March 31)
-  if (month >= 1 && month <= 2) {
+  if (month >= 1 || month <= 2) {
     return {
-      movieIds: [1054867, 858024, 1233413],
-      title: 'Awards Season Favorites',
-      description:
-        "Celebrating the films that defined this year's awards season.",
+      movieIds: [687163, 1368337, 1170608],
+      title: 'Most Anticipated',
+      description: "The movies we're looking forward to in 2026",
     };
   }
 
   // Default - Year Round Favorites
   return {
-    movieIds: [1233575, 1054867, 1242898],
-    title: 'Favorites of the Year',
-    description:
-      "It's been a fantastic year at the movies. These are just a few of our favorites of the year (so far).",
+    movieIds: [687163, 1368337, 1170608],
+    title: 'Most Anticipated',
+    description: "The movies we're looking forward to in 2026",
   };
 };
