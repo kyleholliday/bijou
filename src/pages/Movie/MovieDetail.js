@@ -35,7 +35,7 @@ const MovieDetail = () => {
 
         // Extract U.S. content rating
         const usRelease = movieData.release_dates?.results?.find(
-          (r) => r.iso_3166_1 === 'US'
+          (r) => r.iso_3166_1 === 'US',
         );
         const certification =
           usRelease?.release_dates?.find((d) => d.certification)
@@ -43,6 +43,7 @@ const MovieDetail = () => {
 
         movieData.certification = certification;
         setMovie(movieData);
+        console.log(movieData);
         document.title = `${movieData.title} • Bijou`;
 
         // Set initial display section
@@ -98,7 +99,7 @@ const MovieDetail = () => {
     if (!movie?.release_dates?.results) return defaultReturn;
 
     const usRelease = movie.release_dates.results.find(
-      (r) => r.iso_3166_1 === 'US'
+      (r) => r.iso_3166_1 === 'US',
     );
 
     if (!usRelease?.release_dates) return defaultReturn;
@@ -147,7 +148,7 @@ const MovieDetail = () => {
     if (!movie?.videos?.results?.length) return null;
 
     const trailers = movie.videos.results.filter(
-      (v) => v.type === 'Trailer' && v.site === 'YouTube'
+      (v) => v.type === 'Trailer' && v.site === 'YouTube',
     );
 
     if (!trailers.length) return null;
@@ -171,7 +172,7 @@ const MovieDetail = () => {
 
   const filterCrewByJob = (job) =>
     movie?.credits?.crew?.filter(
-      (crewMember) => crewMember.job?.toLowerCase() === job
+      (crewMember) => crewMember.job?.toLowerCase() === job,
     ) || [];
 
   const filterStoryCredits = () => {
@@ -197,8 +198,6 @@ const MovieDetail = () => {
 
   const bestTrailer = getBestTrailer(movie);
   const upcomingInfo = getUpcomingInfo(movie);
-
-  console.log(movie);
 
   return (
     <div className="movie-detail-wrapper">
@@ -263,7 +262,7 @@ const MovieDetail = () => {
                       movie.id,
                       'movie',
                       movie.title,
-                      movie.poster_path
+                      movie.poster_path,
                     )
                   }
                   className={`favorite-button-standalone ${
@@ -386,7 +385,7 @@ const MovieDetail = () => {
                       day: 'numeric',
                       timeZone: 'UTC',
                     }).format(
-                      new Date(upcomingInfo.releaseDate + 'T00:00:00Z')
+                      new Date(upcomingInfo.releaseDate + 'T00:00:00Z'),
                     )}
                   </p>
                 </div>
@@ -535,7 +534,7 @@ const MovieDetail = () => {
                                 <span key={dp.id} className="crew-name">
                                   {dp.name}
                                 </span>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
@@ -554,7 +553,7 @@ const MovieDetail = () => {
                                 <span key={composer.id} className="crew-name">
                                   {composer.name}
                                 </span>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
