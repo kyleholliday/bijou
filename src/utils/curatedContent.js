@@ -25,7 +25,7 @@ export const getCuratedContent = () => {
   // Summer Blockbusters (June 1 - August 31)
   if (month >= 5 && month <= 7) {
     return {
-      movieIds: [1184918, 718821, 519182],
+      movieIds: [1339713, 1083381, 1275779],
       title: 'Summer Blockbusters',
       description: 'The biggest hits making waves this summer.',
     };
