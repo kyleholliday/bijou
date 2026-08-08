@@ -111,7 +111,7 @@ const HorizontalScrollSection = ({
             const releaseDate = item.release_date || item.first_air_date;
             const posterPath = item.poster_path
               ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-              : '/sorry.png';
+              : '/nope.png';
 
             return (
               <Link to={linkPath} key={item.id} className="scroll-item">

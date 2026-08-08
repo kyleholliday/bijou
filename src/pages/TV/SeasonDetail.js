@@ -146,7 +146,7 @@ const SeasonDetail = () => {
                 src={
                   season.poster_path
                     ? `https://image.tmdb.org/t/p/w500/${season.poster_path}.jpg`
-                    : '/sorry.png'
+                    : '/nope.png'
                 }
                 alt={`Season ${season.season_number} Poster`}
               />
@@ -170,7 +170,7 @@ const SeasonDetail = () => {
                             src={
                               episode.still_path
                                 ? `https://image.tmdb.org/t/p/w500/${episode.still_path}.jpg`
-                                : '/sorry-horizontal.png'
+                                : '/nope.png'
                             }
                             alt={`${episode.name}`}
                           />

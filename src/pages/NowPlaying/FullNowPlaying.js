@@ -155,7 +155,7 @@ const NowPlayingMoviesPage = () => {
                   src={
                     movie.poster_path
                       ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-                      : '/sorry.png'
+                      : '/nope.png'
                   }
                   alt={movie.title}
                   loading="lazy"

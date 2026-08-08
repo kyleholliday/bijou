@@ -23,16 +23,16 @@ export const getCuratedContent = () => {
   }
 
   // Summer Blockbusters (June 1 - August 31)
-  if (month >= 5 && month <= 7) {
-    return {
-      movieIds: [1339713, 1368337, 1275779],
-      title: 'Summer Blockbusters',
-      description: 'The biggest hits making waves this summer.',
-    };
-  }
+  // if (month >= 5 && month <= 7) {
+  //   return {
+  //     movieIds: [1339713, 1368337, 1275779],
+  //     title: 'Summer Blockbusters',
+  //     description: 'The biggest hits making waves this summer.',
+  //   };
+  // }
 
   // Spring/Awards Season (February 1 - March 31)
-  if (month >= 1 || month <= 2) {
+  if (month >= 1 && month <= 2) {
     return {
       movieIds: [687163, 1368337, 1170608],
       title: 'Most Anticipated',

@@ -32,7 +32,7 @@ const getAge = (dob, deathday) => {
   return age;
 };
 const getImage = (path) =>
-  path ? `https://image.tmdb.org/t/p/w500${path}` : '/sorry.png';
+  path ? `https://image.tmdb.org/t/p/w500${path}` : '/nope.png';
 
 // Consolidated sorting function
 const sortCredits = (credits, sortType, dateField) => {

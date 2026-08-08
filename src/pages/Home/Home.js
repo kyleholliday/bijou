@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Backdrop from './Backdrop';
-// import GenreQuickLinks from '../../components/GenreQuickLinks';
 import HorizontalScrollSection from '../../components/HorizontalScrollSection';
 import '../../styles/Home.scss';
 import CuratedPicks from '../../components/CuratedPicks';
@@ -11,10 +10,8 @@ const Home = () => {
   const [nowPlaying, setNowPlaying] = useState([]);
   const [upcoming, setUpcoming] = useState([]);
   const [trendingTV, setTrendingTV] = useState([]);
-  // const [popularTV, setPopularTV] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // const halloweenPicks = [575776, 913290, 1008042];
   const curatedContent = getCuratedContent();
 
   useEffect(() => {
@@ -79,23 +76,6 @@ const Home = () => {
       .catch((error) => {
         console.error('Error fetching the Trending TV Shows:', error);
       });
-
-    // Fetch Popular TV
-    // const popularTVEndpoint = 'https://api.themoviedb.org/3/tv/popular';
-    // axios
-    //   .get(popularTVEndpoint, {
-    //     params: {
-    //       api_key: apiKey,
-    //       language: 'en-US',
-    //       region: 'US',
-    //     },
-    //   })
-    //   .then((response) => {
-    //     setPopularTV(response.data.results.slice(0, 12));
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error fetching the Popular TV Shows:', error);
-    //   });
   }, []);
 
   if (loading) {
@@ -111,7 +91,6 @@ const Home = () => {
   return (
     <div className="home-page">
       <Backdrop />
-      {/* <GenreQuickLinks /> */}
 
       <CuratedPicks
         title={curatedContent.title}
@@ -151,17 +130,6 @@ const Home = () => {
             seeAllLink="/tv-trending"
           />
         )}
-
-        {/* <div className="divider"></div>
-
-        {popularTV.length > 0 && (
-          <HorizontalScrollSection
-            title="Popular TV"
-            items={popularTV}
-            type="show"
-            seeAllLink="/tv-trending"
-          />
-        )} */}
       </div>
     </div>
   );

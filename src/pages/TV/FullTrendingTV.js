@@ -142,7 +142,7 @@ const TVTrendingPage = () => {
                   src={
                     show.poster_path
                       ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
-                      : '/sorry.png'
+                      : '/nope.png'
                   }
                   alt={show.title}
                   loading="lazy"

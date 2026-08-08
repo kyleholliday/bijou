@@ -118,7 +118,6 @@ export default function MoviePicker() {
         );
         const data = await response.json();
         allMovies.push(...(data.results || []));
-        console.log(allMovies);
       }
 
       setResults(allMovies);
@@ -137,7 +136,6 @@ export default function MoviePicker() {
 
   const shuffle = () => {
     setDisplayedMovies(selectRandomThree(results));
-    console.log(displayedMovies);
   };
 
   return (

@@ -377,7 +377,7 @@ const Profile = () => {
                       src={
                         favorite.poster_path
                           ? `https://image.tmdb.org/t/p/w500${favorite.poster_path}`
-                          : '/sorry.png'
+                          : '/nope.png'
                       }
                       alt={favorite.title}
                     />

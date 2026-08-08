@@ -96,7 +96,7 @@ const EpisodeDetail = () => {
                 src={
                   episode.still_path
                     ? `https://image.tmdb.org/t/p/original${episode.still_path}`
-                    : '/sorry-horizontal.png'
+                    : '/nope.png'
                 }
                 alt={episode.name}
                 className="episode-image"

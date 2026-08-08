@@ -92,8 +92,6 @@ const TVDetail = () => {
     setDisplaySection(section);
   };
 
-  console.log(show);
-
   return (
     <div className="movie-detail-wrapper">
       {/* Full Backdrop Section */}
@@ -121,7 +119,7 @@ const TVDetail = () => {
                 src={
                   show.poster_path
                     ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
-                    : '/sorry.png'
+                    : '/nope.png'
                 }
                 alt={show.title}
                 className="poster-image"
