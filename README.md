@@ -5,5 +5,3 @@ This project is a movie and television database. Discover a world of entertainme
 Open [http://www.bijou-movies.com](http://www.bijou-movies.com) to view it in your browser.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-![alt text](/public/full-site-home-2025.png 'Bijou Homepage')
