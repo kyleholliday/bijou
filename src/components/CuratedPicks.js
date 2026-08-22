@@ -2,38 +2,80 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { getUsReleaseInfo } from '../utils/releaseInfo';
+import { pickRandom } from '../utils/random';
 import '../styles/CuratedPicks.scss';
 
-const CuratedPicks = ({ title, description, movieIds, theme = 'dark' }) => {
+const CuratedPicks = ({
+  title,
+  description,
+  movieIds,
+  moviePool,
+  fallbackMovieIds,
+  theme = 'dark',
+}) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      const apiKey = process.env.REACT_APP_API_KEY;
+    const apiKey = process.env.REACT_APP_API_KEY;
 
+    // Fetches a fixed set of movies by ID, in order. Optionally appends
+    // release_dates so callers can check real-world release status.
+    const fetchMoviesByIds = async (ids, appendReleaseDates = false) => {
+      const requests = ids.map((id) =>
+        axios.get(`https://api.themoviedb.org/3/movie/${id}`, {
+          params: {
+            api_key: apiKey,
+            language: 'en-US',
+            ...(appendReleaseDates && { append_to_response: 'release_dates' }),
+          },
+        })
+      );
+      const responses = await Promise.all(requests);
+      return responses.map((res) => res.data);
+    };
+
+    // Static picks (e.g. seasonal lists): show exactly the given IDs.
+    const fetchStaticPicks = async () => {
       try {
-        // Fetch each movie by ID
-        const requests = movieIds.map((id) =>
-          axios.get(`https://api.themoviedb.org/3/movie/${id}`, {
-            params: { api_key: apiKey, language: 'en-US' },
-          })
-        );
-
-        const responses = await Promise.all(requests);
-        const movieData = responses.map((res) => res.data);
-        setMovies(movieData);
-        setLoading(false);
+        setMovies(await fetchMoviesByIds(movieIds));
       } catch (error) {
         console.error('Error fetching curated movies:', error);
+      } finally {
         setLoading(false);
       }
     };
 
-    if (movieIds?.length) {
-      fetchMovies();
+    // Dynamic "Most Anticipated" picks: fetch the whole candidate pool,
+    // keep only the ones that haven't released yet, and show 3 at random.
+    // If the pool has gone stale (fewer than 3 unreleased), fall back to a
+    // fixed backup list instead.
+    const fetchAnticipatedPicks = async () => {
+      try {
+        const poolMovies = await fetchMoviesByIds(moviePool, true);
+        const unreleased = poolMovies.filter(
+          (movie) => getUsReleaseInfo(movie).isUpcoming
+        );
+
+        if (unreleased.length < 3) {
+          setMovies(await fetchMoviesByIds(fallbackMovieIds));
+        } else {
+          setMovies(pickRandom(unreleased, 3));
+        }
+      } catch (error) {
+        console.error('Error fetching anticipated movies:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (moviePool?.length) {
+      fetchAnticipatedPicks();
+    } else if (movieIds?.length) {
+      fetchStaticPicks();
     }
-  }, [movieIds]);
+  }, [movieIds, moviePool, fallbackMovieIds]);
 
   const getReleaseYear = (date) => (date ? date.split('-')[0] : 'TBD');
 

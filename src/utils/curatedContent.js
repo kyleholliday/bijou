@@ -1,3 +1,22 @@
+// Candidate pool for the dynamic "Most Anticipated" list. Anything in here
+// that hasn't released yet (per TMDB's US release date, same check used for
+// the "Coming Soon" label on the movie detail page) is eligible to show —
+// three are picked at random on each load. Add new movie IDs here as you
+// hear about them; once a movie releases it drops out of the pool
+// automatically, no cleanup needed.
+const ANTICIPATED_POOL = [
+  1204680, // Coyote vs. Acme
+  1170608, // Dune: Part Three
+  1003596, // Avengers: Doomsday
+  1248832, // Digger
+  1423191, // Resident Evil
+  1421903, // Werwulf
+];
+
+// Shown instead of the pool above if fewer than 3 candidates are still
+// unreleased (e.g. the pool has gone stale and needs new IDs added).
+const ANTICIPATED_FALLBACK = [687163, 1170608];
+
 export const getCuratedContent = () => {
   const now = new Date();
   const month = now.getMonth(); // 0-11
@@ -22,19 +41,14 @@ export const getCuratedContent = () => {
     };
   }
 
-  // Spring/Awards Season (February 1 - March 31)
-  if (month >= 1 && month <= 2) {
-    return {
-      movieIds: [687163, 1368337, 1170608],
-      title: 'Most Anticipated',
-      description: "The movies we're looking forward to in 2026",
-    };
-  }
-
-  // Default - Year Round Favorites
+  // Default (also covers Spring/Awards Season) — Most Anticipated, three
+  // random unreleased picks from ANTICIPATED_POOL. See CuratedPicks.js for
+  // the fetch/filter/randomize logic.
   return {
-    movieIds: [687163, 1368337, 1170608],
+    moviePool: ANTICIPATED_POOL,
+    fallbackMovieIds: ANTICIPATED_FALLBACK,
     title: 'Most Anticipated',
-    description: "The movies we're looking forward to in 2026",
+    description:
+      "We've had a great year for movies, but we still have a few more we're looking forward to.",
   };
 };

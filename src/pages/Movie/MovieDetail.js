@@ -5,6 +5,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { getUsReleaseInfo } from '../../utils/releaseInfo';
 import '../../styles/MovieDetail.scss';
 
 const MovieDetail = () => {
@@ -89,45 +90,6 @@ const MovieDetail = () => {
     return 'TBD';
   };
 
-  const getUpcomingInfo = (movie) => {
-    // default return for when release_dates data can't be found
-    const defaultReturn = {
-      isUpcoming: false,
-      releaseDate: movie?.release_date || null,
-    };
-
-    if (!movie?.release_dates?.results) return defaultReturn;
-
-    const usRelease = movie.release_dates.results.find(
-      (r) => r.iso_3166_1 === 'US',
-    );
-
-    if (!usRelease?.release_dates) return defaultReturn;
-
-    // priority: wide theatrical (3) > limited theatrical (2) > digital (4)
-    let targetRelease = usRelease.release_dates.find((d) => d.type === 3);
-    if (!targetRelease) {
-      targetRelease = usRelease.release_dates.find((d) => d.type === 2);
-    }
-    if (!targetRelease) {
-      targetRelease = usRelease.release_dates.find((d) => d.type === 4);
-    }
-
-    if (!targetRelease?.release_date) return defaultReturn;
-
-    const today = new Date();
-    const releaseDate = new Date(targetRelease.release_date);
-
-    // time's set to midnight for comparison b/t the two dates
-    today.setHours(0, 0, 0, 0);
-    releaseDate.setHours(0, 0, 0, 0);
-
-    return {
-      isUpcoming: releaseDate > today,
-      releaseDate: targetRelease.release_date.split('T')[0],
-    };
-  };
-
   const timeConverter = (minutesString) => {
     const totalMinutes = parseInt(minutesString, 10);
     if (isNaN(totalMinutes)) return '';
@@ -197,7 +159,7 @@ const MovieDetail = () => {
   }
 
   const bestTrailer = getBestTrailer(movie);
-  const upcomingInfo = getUpcomingInfo(movie);
+  const upcomingInfo = getUsReleaseInfo(movie);
 
   return (
     <div className="movie-detail-wrapper">

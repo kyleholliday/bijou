@@ -96,6 +96,8 @@ const Home = () => {
         title={curatedContent.title}
         description={curatedContent.description}
         movieIds={curatedContent.movieIds}
+        moviePool={curatedContent.moviePool}
+        fallbackMovieIds={curatedContent.fallbackMovieIds}
         theme="dark"
       />
 
