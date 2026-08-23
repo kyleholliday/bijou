@@ -5,17 +5,21 @@
 // hear about them; once a movie releases it drops out of the pool
 // automatically, no cleanup needed.
 const ANTICIPATED_POOL = [
-  1204680, // Coyote vs. Acme
   1170608, // Dune: Part Three
   1003596, // Avengers: Doomsday
   1248832, // Digger
   1423191, // Resident Evil
-  1421903, // Werwulf
+  1421903, // Werwulf,
+  1284046, //Onslaught
+  1058424, // Hope
+  1375441, // Primetime
+  891621, // Wild Horse Nine
+  1452168, // Behemoth
 ];
 
 // Shown instead of the pool above if fewer than 3 candidates are still
 // unreleased (e.g. the pool has gone stale and needs new IDs added).
-const ANTICIPATED_FALLBACK = [687163, 1170608];
+const ANTICIPATED_FALLBACK = [687163, 1170608, 1368337];
 
 export const getCuratedContent = () => {
   const now = new Date();
@@ -50,5 +54,7 @@ export const getCuratedContent = () => {
     title: 'Most Anticipated',
     description:
       "We've had a great year for movies, but we still have a few more we're looking forward to.",
+    fallbackDescription:
+      "Here are a few of our favorite picks you won't want to miss.",
   };
 };

@@ -9,6 +9,7 @@ import '../styles/CuratedPicks.scss';
 const CuratedPicks = ({
   title,
   description,
+  fallbackDescription,
   movieIds,
   moviePool,
   fallbackMovieIds,
@@ -16,6 +17,7 @@ const CuratedPicks = ({
 }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
     const apiKey = process.env.REACT_APP_API_KEY;
@@ -30,7 +32,7 @@ const CuratedPicks = ({
             language: 'en-US',
             ...(appendReleaseDates && { append_to_response: 'release_dates' }),
           },
-        })
+        }),
       );
       const responses = await Promise.all(requests);
       return responses.map((res) => res.data);
@@ -39,6 +41,7 @@ const CuratedPicks = ({
     // Static picks (e.g. seasonal lists): show exactly the given IDs.
     const fetchStaticPicks = async () => {
       try {
+        setUsingFallback(false);
         setMovies(await fetchMoviesByIds(movieIds));
       } catch (error) {
         console.error('Error fetching curated movies:', error);
@@ -55,13 +58,15 @@ const CuratedPicks = ({
       try {
         const poolMovies = await fetchMoviesByIds(moviePool, true);
         const unreleased = poolMovies.filter(
-          (movie) => getUsReleaseInfo(movie).isUpcoming
+          (movie) => getUsReleaseInfo(movie).isUpcoming,
         );
 
         if (unreleased.length < 3) {
+          setUsingFallback(true);
           setMovies(await fetchMoviesByIds(fallbackMovieIds));
         } else {
-          setMovies(pickRandom(unreleased, 3));
+          setUsingFallback(false);
+          setMovies(pickRandom(unreleased, 4));
         }
       } catch (error) {
         console.error('Error fetching anticipated movies:', error);
@@ -96,7 +101,11 @@ const CuratedPicks = ({
               Editor's Pick
             </span>
             <h2 className="curated-title">{title}</h2>
-            <p className="curated-description">{description}</p>
+            <p className="curated-description">
+              {usingFallback && fallbackDescription
+                ? fallbackDescription
+                : description}
+            </p>
           </div>
         </div>
 
