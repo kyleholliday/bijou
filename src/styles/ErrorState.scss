@@ -1,0 +1,14 @@
+.error-container {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+
+  .error-message {
+    color: var(--main-yellow);
+    font-size: 1.15rem;
+    margin: 0;
+  }
+}

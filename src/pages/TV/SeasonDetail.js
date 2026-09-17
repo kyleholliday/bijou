@@ -1,30 +1,31 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { tmdb } from '../../services/tmdb';
+import ErrorState from '../../components/ErrorState';
 import '../../styles/SeasonDetail.scss';
 
 const SeasonDetail = () => {
   const { tvId, seasonNumber } = useParams();
   const navigate = useNavigate();
   const [season, setSeason] = useState(null);
+  const [error, setError] = useState(false);
   const [showInfo, setShowInfo] = useState(null);
   const [allSeasons, setAllSeasons] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const apiKey = process.env.REACT_APP_API_KEY;
-      const seasonEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}?language=en-US`;
-      const showEndpoint = `https://api.themoviedb.org/3/tv/${tvId}?language=en-US`;
-
       try {
         // Fetch both season and show data in parallel
         const [seasonResponse, showResponse] = await Promise.all([
-          axios.get(seasonEndpoint, { params: { api_key: apiKey } }),
-          axios.get(showEndpoint, { params: { api_key: apiKey } }),
+          tmdb.get(`/tv/${tvId}/season/${seasonNumber}`),
+          tmdb.get(`/tv/${tvId}`),
         ]);
 
         const seasonData = seasonResponse.data;
         const showData = showResponse.data;
+
+        console.log('Season Data:', seasonData);
+        console.log('Show Data:', showData);
 
         setSeason(seasonData);
         setShowInfo(showData);
@@ -32,6 +33,7 @@ const SeasonDetail = () => {
         document.title = `${seasonData.name} - ${showData.name}`;
       } catch (error) {
         console.error('Error fetching Season', error);
+        setError(true);
       }
     };
 
@@ -51,6 +53,10 @@ const SeasonDetail = () => {
       timeZone: 'UTC',
     }).format(date);
   };
+
+  if (error) {
+    return <ErrorState message="We couldn't load this season." />;
+  }
 
   // Added loading state
   if (!season || !showInfo) {
@@ -145,7 +151,7 @@ const SeasonDetail = () => {
               <img
                 src={
                   season.poster_path
-                    ? `https://image.tmdb.org/t/p/w500/${season.poster_path}.jpg`
+                    ? `https://image.tmdb.org/t/p/w500${season.poster_path}`
                     : '/nope.png'
                 }
                 alt={`Season ${season.season_number} Poster`}
@@ -169,7 +175,7 @@ const SeasonDetail = () => {
                           <img
                             src={
                               episode.still_path
-                                ? `https://image.tmdb.org/t/p/w500/${episode.still_path}.jpg`
+                                ? `https://image.tmdb.org/t/p/w500${episode.still_path}`
                                 : '/nope.png'
                             }
                             alt={`${episode.name}`}

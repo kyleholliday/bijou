@@ -1,43 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../services/supabase';
 import '../styles/Navbar.scss';
 
 const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userAvatar, setUserAvatar] = useState(null);
   const navigate = useNavigate();
 
-  const { user } = useAuth();
-
-  // Fetch user avatar when user changes
-  useEffect(() => {
-    const fetchUserAvatar = async () => {
-      try {
-        const { data } = await supabase
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (data && data.avatar_url) {
-          setUserAvatar(data.avatar_url);
-        }
-      } catch (error) {
-        console.error('Error fetching avatar:', error);
-      }
-    };
-
-    if (user) {
-      fetchUserAvatar();
-    } else {
-      setUserAvatar(null);
-    }
-  }, [user]);
+  const { user, userProfile } = useAuth();
+  const userAvatar = userProfile?.avatar?.url;
 
   const handleSearch = () => {
     if (searchTerm.trim() !== '') {

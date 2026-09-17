@@ -1,6 +1,7 @@
 // MoviePicker.jsx
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { tmdb } from '../../services/tmdb';
 import './MoviePicker.scss';
 
 const GENRES = [
@@ -88,36 +89,31 @@ export default function MoviePicker() {
 
     try {
       for (let page = 1; page <= 3; page++) {
-        const params = new URLSearchParams({
-          api_key: `${process.env.REACT_APP_API_KEY}`,
-          language: 'en-US',
+        const params = {
           sort_by: 'vote_average.desc',
           'vote_count.gte': 100,
           page: page,
           original_language: 'en',
-        });
+        };
 
         if (filters.genres.length > 0) {
-          params.append('with_genres', filters.genres.join(','));
+          params.with_genres = filters.genres.join(',');
         }
 
         if (filters.decade) {
-          params.append('primary_release_date.gte', filters.decade.gte);
-          params.append('primary_release_date.lte', filters.decade.lte);
+          params['primary_release_date.gte'] = filters.decade.gte;
+          params['primary_release_date.lte'] = filters.decade.lte;
         }
 
         if (filters.runtime) {
           if (filters.runtime.gte)
-            params.append('with_runtime.gte', filters.runtime.gte);
+            params['with_runtime.gte'] = filters.runtime.gte;
           if (filters.runtime.lte)
-            params.append('with_runtime.lte', filters.runtime.lte);
+            params['with_runtime.lte'] = filters.runtime.lte;
         }
 
-        const response = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?${params}`
-        );
-        const data = await response.json();
-        allMovies.push(...(data.results || []));
+        const response = await tmdb.get('/discover/movie', { params });
+        allMovies.push(...(response.data.results || []));
       }
 
       setResults(allMovies);

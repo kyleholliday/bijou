@@ -5,45 +5,19 @@ const AuthContext = createContext({});
 
 export const useAuth = () => useContext(AuthContext);
 
-// Avatar options that match Profile.js
 const avatarOptions = [
-  {
-    id: 1,
-    name: 'Neo',
-    url: 'https://i.pravatar.cc/150?img=11',
-    color: '#00ff41',
-  },
-  {
-    id: 2,
-    name: 'Trinity',
-    url: 'https://i.pravatar.cc/150?img=5',
-    color: '#ff006e',
-  },
-  {
-    id: 3,
-    name: 'Morpheus',
-    url: 'https://i.pravatar.cc/150?img=13',
-    color: '#3a86ff',
-  },
-  {
-    id: 4,
-    name: 'Agent Smith',
-    url: 'https://i.pravatar.cc/150?img=8',
-    color: '#fb5607',
-  },
-  {
-    id: 5,
-    name: 'Oracle',
-    url: 'https://i.pravatar.cc/150?img=9',
-    color: '#ffbe0b',
-  },
-  {
-    id: 6,
-    name: 'Architect',
-    url: 'https://i.pravatar.cc/150?img=7',
-    color: '#8338ec',
-  },
+  { id: 1, name: 'Arnie', url: '/arnie.png', color: '#ff0000' },
+  { id: 2, name: 'Bob', url: '/bob.png', color: '#9e2dadff' },
+  { id: 3, name: 'Jules', url: '/jules.png', color: '#1e90ff' },
+  { id: 4, name: 'Peter Parker', url: '/peter-parker.png', color: '#00ff00' },
+  { id: 5, name: 'Ripley', url: '/ripley.png', color: '#0066cc' },
+  { id: 6, name: 'Yoda', url: '/yoda.png', color: '#ff3333' },
 ];
+
+const withAvatar = (profile) => ({
+  ...profile,
+  avatar: avatarOptions.find((a) => a.id === profile.avatar_id) || null,
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -51,7 +25,21 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check active sessions and sets the user
+    const fetchUserProfile = async (userId) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url, avatar_id')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      setUserProfile(data ? withAvatar(data) : null);
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -60,7 +48,6 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
 
-    // Listen for changes on auth state (sign in, sign out, etc.)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -76,54 +63,52 @@ export const AuthProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserProfile = async (userId) => {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('avatar_url, avatar_id')
-        .eq('id', userId)
-        .single();
+  const updateAvatar = async (avatar) => {
+    if (!user) return { error: new Error('Not logged in') };
 
-      if (data) {
-        // Find the avatar object from our options
-        const avatar = avatarOptions.find((a) => a.id === data.avatar_id);
-        setUserProfile({
-          ...data,
-          avatar: avatar || null,
-        });
+    try {
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (fetchError) {
+        throw new Error(`Failed to check profile: ${fetchError.message}`);
       }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
 
-  // Function to update user profile (can be called from Profile component)
-  const updateUserProfile = async (updates) => {
-    if (!user) return;
+      if (existingProfile) {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            avatar_url: avatar.url,
+            avatar_id: avatar.id,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id);
 
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .upsert({
+        if (updateError) throw new Error(`Update failed: ${updateError.message}`);
+      } else {
+        const { error: insertError } = await supabase.from('profiles').insert({
           id: user.id,
-          ...updates,
+          avatar_url: avatar.url,
+          avatar_id: avatar.id,
+          email: user.email,
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (data) {
-        const avatar = avatarOptions.find((a) => a.id === data.avatar_id);
-        setUserProfile({
-          ...data,
-          avatar: avatar || null,
         });
+
+        if (insertError) throw new Error(`Insert failed: ${insertError.message}`);
       }
 
-      return { data, error };
+      setUserProfile(
+        withAvatar({ avatar_url: avatar.url, avatar_id: avatar.id }),
+      );
+
+      return { error: null };
     } catch (error) {
-      console.error('Error updating profile:', error);
-      return { data: null, error };
+      console.error('Error updating avatar:', error);
+      return { error };
     }
   };
 
@@ -131,8 +116,8 @@ export const AuthProvider = ({ children }) => {
     user,
     userProfile,
     loading,
-    updateUserProfile,
     avatarOptions,
+    updateAvatar,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

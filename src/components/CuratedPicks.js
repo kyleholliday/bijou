@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { tmdb } from '../services/tmdb';
 import { getUsReleaseInfo } from '../utils/releaseInfo';
 import { pickRandom } from '../utils/random';
 import '../styles/CuratedPicks.scss';
@@ -20,16 +20,12 @@ const CuratedPicks = ({
   const [usingFallback, setUsingFallback] = useState(false);
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_API_KEY;
-
     // Fetches a fixed set of movies by ID, in order. Optionally appends
     // release_dates so callers can check real-world release status.
     const fetchMoviesByIds = async (ids, appendReleaseDates = false) => {
       const requests = ids.map((id) =>
-        axios.get(`https://api.themoviedb.org/3/movie/${id}`, {
+        tmdb.get(`/movie/${id}`, {
           params: {
-            api_key: apiKey,
-            language: 'en-US',
             ...(appendReleaseDates && { append_to_response: 'release_dates' }),
           },
         }),

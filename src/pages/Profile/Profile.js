@@ -2,149 +2,34 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useFavorites } from '../../hooks/useFavorites';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Profile.scss';
 
-const avatarOptions = [
-  {
-    id: 1,
-    name: '',
-    url: 'arnie.png',
-    color: '#ff0000',
-  },
-  {
-    id: 2,
-    name: '',
-    url: 'bob.png',
-    color: '#9e2dadff',
-  },
-  {
-    id: 3,
-    name: '',
-    url: 'jules.png',
-    color: '#1e90ff',
-  },
-  {
-    id: 4,
-    name: '',
-    url: 'peter-parker.png',
-    color: '#00ff00',
-  },
-  {
-    id: 5,
-    name: '',
-    url: 'ripley.png',
-    color: '#0066cc',
-  },
-  {
-    id: 6,
-    name: '',
-    url: 'yoda.png',
-    color: '#ff3333',
-  },
-];
-
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, userProfile, avatarOptions, updateAvatar } = useAuth();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [showAvatarModal, setShowAvatarModal] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [userProfile, setUserProfile] = useState(null);
   const [profileError, setProfileError] = useState(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('avatar_url, avatar_id')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (error) {
-          console.error('Error fetching profile:', error);
-          setProfileError(error.message);
-          return;
-        }
-
-        if (data) {
-          setUserProfile(data);
-          const avatar = avatarOptions.find((a) => a.id === data.avatar_id);
-          if (avatar) {
-            setSelectedAvatar(avatar);
-          }
-        }
-      } catch (error) {
-        console.error('Error in fetchUserProfile:', error);
-        setProfileError(error.message);
-      }
-    };
-
-    if (user) {
-      fetchUserProfile();
-    }
-  }, [user]);
+  const selectedAvatar = userProfile?.avatar ?? null;
 
   const handleAvatarSelect = async (avatar) => {
     setIsUpdating(true);
-    try {
-      // Check if profile exists
-      const { data: existingProfile, error: fetchError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .maybeSingle();
 
-      if (fetchError) {
-        throw new Error(`Failed to check profile: ${fetchError.message}`);
-      }
+    const { error } = await updateAvatar(avatar);
 
-      if (existingProfile) {
-        // Update existing profile
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({
-            avatar_url: avatar.url,
-            avatar_id: avatar.id,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', user.id);
-
-        if (updateError)
-          throw new Error(`Update failed: ${updateError.message}`);
-      } else {
-        // Create new profile
-        const { error: insertError } = await supabase.from('profiles').insert({
-          id: user.id,
-          avatar_url: avatar.url,
-          avatar_id: avatar.id,
-          email: user.email,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-
-        if (insertError)
-          throw new Error(`Insert failed: ${insertError.message}`);
-      }
-
-      setSelectedAvatar(avatar);
-      setShowAvatarModal(false);
-      setUserProfile({
-        ...userProfile,
-        avatar_url: avatar.url,
-        avatar_id: avatar.id,
-      });
-      setProfileError(null);
-    } catch (error) {
-      console.error('Error updating avatar:', error);
+    if (error) {
       setProfileError(error.message);
       alert(`Failed to update avatar: ${error.message}`);
-    } finally {
-      setIsUpdating(false);
+    } else {
+      setProfileError(null);
+      setShowAvatarModal(false);
     }
+
+    setIsUpdating(false);
   };
 
   if (!user) {

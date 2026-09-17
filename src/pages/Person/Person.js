@@ -1,11 +1,12 @@
-import { useEffect, useState, useMemo } from 'react'; // Add useRef
-import axios from 'axios';
+import { useEffect, useState, useMemo } from 'react';
 import {
   Link,
   useParams,
   useLocation,
   useSearchParams,
 } from 'react-router-dom';
+import { tmdb } from '../../services/tmdb';
+import ErrorState from '../../components/ErrorState';
 import '../../styles/Person.scss';
 
 // Utilities
@@ -86,11 +87,9 @@ const Person = () => {
   const { personId } = useParams();
   const location = useLocation();
   const [data, setData] = useState(null);
+  const [error, setError] = useState(false);
   const [showFullBio, setShowFullBio] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [primaryTab, setPrimaryTab] = useState(
-    searchParams.get('tab') || 'movies'
-  );
   const [movieSort, setMovieSort] = useState(
     searchParams.get('movieSort') || 'popularity'
   );
@@ -99,7 +98,6 @@ const Person = () => {
   );
 
   const isActorRoute = location.pathname.includes('/actor/');
-  const isDirectorRoute = location.pathname.includes('/director/');
 
   // Update URL and state together
   const updateSort = (type, value) => {
@@ -113,7 +111,6 @@ const Person = () => {
   };
 
   const updateTab = (tab) => {
-    setPrimaryTab(tab);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('tab', tab);
     setSearchParams(newParams, { preventScrollReset: true });
@@ -121,18 +118,10 @@ const Person = () => {
 
   useEffect(() => {
     const fetchPersonData = async () => {
-      const apiKey = process.env.REACT_APP_API_KEY;
-      const detailsUrl = `https://api.themoviedb.org/3/person/${personId}`;
-      const creditsUrl = `https://api.themoviedb.org/3/person/${personId}/combined_credits`;
-
       try {
         const [detailsRes, creditsRes] = await Promise.all([
-          axios.get(detailsUrl, {
-            params: { api_key: apiKey, language: 'en-US' },
-          }),
-          axios.get(creditsUrl, {
-            params: { api_key: apiKey, language: 'en-US' },
-          }),
+          tmdb.get(`/person/${personId}`),
+          tmdb.get(`/person/${personId}/combined_credits`),
         ]);
 
         const details = detailsRes.data;
@@ -175,35 +164,14 @@ const Person = () => {
         });
 
         document.title = details.name;
-
-        // Auto-select first available tab
-        // Auto-select first available tab ONLY if no tab in URL
-        if (!searchParams.get('tab')) {
-          if (isActorRoute) {
-            const defaultTab = actingMovies.length ? 'movies' : 'tv';
-            setPrimaryTab(defaultTab);
-            const newParams = new URLSearchParams(searchParams);
-            newParams.set('tab', defaultTab);
-            setSearchParams(newParams, {
-              replace: true,
-            });
-          } else if (isDirectorRoute) {
-            const defaultTab = directingMovies.length ? 'movies' : 'tv';
-            setPrimaryTab(defaultTab);
-            const newParams = new URLSearchParams(searchParams);
-            newParams.set('tab', defaultTab);
-            setSearchParams(newParams, {
-              replace: true,
-            });
-          }
-        }
       } catch (err) {
         console.error('Fetch error:', err);
+        setError(true);
       }
     };
 
     fetchPersonData();
-  }, [personId, isActorRoute, isDirectorRoute, searchParams, setSearchParams]);
+  }, [personId]);
 
   const sortedActingMovies = useMemo(
     () => sortCredits(data?.actingMovies || [], movieSort, 'release_date'),
@@ -224,6 +192,9 @@ const Person = () => {
     () => sortCredits(data?.directingTV || [], tvSort, 'first_air_date'),
     [data?.directingTV, tvSort]
   );
+
+  if (error)
+    return <ErrorState message="We couldn't load this person's profile." />;
 
   if (!data)
     return (
@@ -247,6 +218,9 @@ const Person = () => {
     secondarySection === 'acting' ? sortedActingMovies : sortedDirectingMovies;
   const secondaryTV =
     secondarySection === 'acting' ? sortedActingTV : sortedDirectingTV;
+
+  const primaryTab =
+    searchParams.get('tab') || (primaryMovies.length > 0 ? 'movies' : 'tv');
 
   const hasPrimaryContent = primaryMovies.length > 0 || primaryTV.length > 0;
   const hasSecondaryContent =

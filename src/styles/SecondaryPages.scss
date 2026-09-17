@@ -10,7 +10,7 @@
 
   // Page Header
   .page-header {
-    max-width: 1600px;
+    max-width: 1200px;
     margin: 0 auto 3rem;
     text-align: center;
 
@@ -42,25 +42,23 @@
   }
 
   // Movies Grid
+  // Fixed column counts (not auto-fill) so the number of posters per row is
+  // predictable at every viewport. 20 items per batch divides evenly by 5, 4
+  // and 2, so the last row is never ragged.
   .movies-grid {
-    max-width: 1600px;
+    max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(5, 1fr);
     gap: 1.5rem;
 
-    @media (max-width: 1400px) {
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    @media (max-width: 1100px) {
+      grid-template-columns: repeat(4, 1fr);
     }
 
-    @media (max-width: 768px) {
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    @media (max-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
-    }
-
-    @media (max-width: 480px) {
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0.75rem;
     }
 
     .movie-card {
@@ -134,26 +132,31 @@
     }
   }
 
-  // Pagination
-  .pagination {
-    max-width: 1600px;
-    margin: 4rem auto 0;
+  // Load More
+  .load-more {
+    max-width: 1200px;
+    margin: 3rem auto 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
 
     @media (max-width: 768px) {
-      margin-top: 3rem;
-      gap: 0.5rem;
+      margin-top: 2rem;
     }
 
-    .pagination-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
+    .load-more-count {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.95rem;
+      margin: 0;
+
+      @media (max-width: 768px) {
+        font-size: 0.85rem;
+      }
+    }
+
+    .load-more-btn {
+      padding: 0.85rem 2.5rem;
       background: rgba(255, 255, 255, 0.05);
       border: 2px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
@@ -164,72 +167,14 @@
       transition: all 0.2s ease;
 
       @media (max-width: 768px) {
-        padding: 0.6rem 1rem;
+        padding: 0.7rem 2rem;
         font-size: 0.9rem;
       }
 
-      svg {
-        width: 20px;
-        height: 20px;
-
-        @media (max-width: 768px) {
-          width: 16px;
-          height: 16px;
-        }
-      }
-
-      &:hover:not(:disabled) {
+      &:hover {
         background: rgba(255, 165, 0, 0.15);
         border-color: #ffa500;
         transform: translateY(-2px);
-      }
-
-      &:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-    }
-
-    .pagination-numbers {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-
-      .pagination-number {
-        min-width: 45px;
-        padding: 0.75rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        color: #fff;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        @media (max-width: 768px) {
-          min-width: 40px;
-          height: 40px;
-          padding: 0.6rem;
-          font-size: 0.9rem;
-        }
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        &.active {
-          background: #ffa500;
-          border-color: #ffa500;
-          color: #000;
-        }
-      }
-
-      .pagination-ellipsis {
-        color: rgba(255, 255, 255, 0.5);
-        padding: 0 0.5rem;
-        font-weight: 600;
       }
     }
   }

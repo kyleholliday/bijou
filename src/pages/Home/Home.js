@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import Backdrop from './Backdrop';
 import HorizontalScrollSection from '../../components/HorizontalScrollSection';
 import '../../styles/Home.scss';
 import CuratedPicks from '../../components/CuratedPicks';
+import { tmdb } from '../../services/tmdb';
 import { getCuratedContent } from '../../utils/curatedContent';
 
 const Home = () => {
@@ -15,19 +15,9 @@ const Home = () => {
   const curatedContent = getCuratedContent();
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_API_KEY;
-
     // Fetch Now Playing
-    const nowPlayingEndpoint = 'https://api.themoviedb.org/3/movie/now_playing';
-    axios
-      .get(nowPlayingEndpoint, {
-        params: {
-          api_key: apiKey,
-          language: 'en-US',
-          region: 'US',
-          page: 1,
-        },
-      })
+    tmdb
+      .get('/movie/now_playing', { params: { region: 'US', page: 1 } })
       .then((response) => {
         setNowPlaying(response.data.results);
         setLoading(false);
@@ -39,14 +29,9 @@ const Home = () => {
 
     // Fetch Upcoming Movies
     const today = new Date().toISOString().split('T')[0];
-    const upcomingEndpoint = `https://api.themoviedb.org/3/movie/upcoming?primary_release_date.gte=${today}`;
-    axios
-      .get(upcomingEndpoint, {
-        params: {
-          api_key: apiKey,
-          language: 'en-US',
-          region: 'US',
-        },
+    tmdb
+      .get('/movie/upcoming', {
+        params: { region: 'US', 'primary_release_date.gte': today },
       })
       .then((response) => {
         const todayDate = new Date();
@@ -61,15 +46,8 @@ const Home = () => {
       });
 
     // Fetch Trending TV
-    const trendingTVEndpoint = 'https://api.themoviedb.org/3/trending/tv/week';
-    axios
-      .get(trendingTVEndpoint, {
-        params: {
-          api_key: apiKey,
-          language: 'en-US',
-          region: 'US',
-        },
-      })
+    tmdb
+      .get('/trending/tv/week')
       .then((response) => {
         setTrendingTV(response.data.results.slice(0, 12));
       })

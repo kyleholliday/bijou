@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { useLocation, Link } from 'react-router-dom';
+import { tmdb } from '../../services/tmdb';
 import '../../styles/SearchResults.scss';
 
 const SearchResults = () => {
@@ -12,18 +12,10 @@ const SearchResults = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiKey = process.env.REACT_APP_API_KEY;
-    const endPoint = 'https://api.themoviedb.org/3/search/multi';
     setLoading(true);
 
-    axios
-      .get(endPoint, {
-        params: {
-          api_key: apiKey,
-          language: 'en-US',
-          query: query,
-        },
-      })
+    tmdb
+      .get('/search/multi', { params: { query: query } })
       .then((response) => {
         // Filter out people from results
         const filteredResults = response.data.results.filter(

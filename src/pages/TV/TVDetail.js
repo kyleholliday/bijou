@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useFavorites } from '../../hooks/useFavorites';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { tmdb } from '../../services/tmdb';
+import ErrorState from '../../components/ErrorState';
 import '../../styles/MovieDetail.scss';
 
 const TVDetail = () => {
@@ -12,6 +13,7 @@ const TVDetail = () => {
   const { user } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [show, setShow] = useState(null);
+  const [error, setError] = useState(false);
   const [usProviders, setUsProviders] = useState(null);
   const [displaySection, setDisplaySection] = useState('cast');
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -19,13 +21,13 @@ const TVDetail = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const apiKey = process.env.REACT_APP_API_KEY;
-        const endpoint = `https://api.themoviedb.org/3/tv/${tvId}?append_to_response=videos,credits,images,content_ratings`;
-        const providersEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/watch/providers`;
-
         const [showRes, providersRes] = await Promise.all([
-          axios.get(endpoint, { params: { api_key: apiKey } }),
-          axios.get(providersEndpoint, { params: { api_key: apiKey } }),
+          tmdb.get(`/tv/${tvId}`, {
+            params: {
+              append_to_response: 'videos,credits,images,content_ratings',
+            },
+          }),
+          tmdb.get(`/tv/${tvId}/watch/providers`),
         ]);
 
         setShow(showRes.data);
@@ -35,6 +37,7 @@ const TVDetail = () => {
         setUsProviders(usData);
       } catch (error) {
         console.error('Error fetching show details or providers', error);
+        setError(true);
       }
     }
 
@@ -84,6 +87,10 @@ const TVDetail = () => {
     return usRating?.rating || null;
   };
 
+  if (error) {
+    return <ErrorState message="We couldn't load this show." />;
+  }
+
   if (!show) {
     return <div>Loading...</div>;
   }
@@ -121,7 +128,7 @@ const TVDetail = () => {
                     ? `https://image.tmdb.org/t/p/w500${show.poster_path}`
                     : '/nope.png'
                 }
-                alt={show.title}
+                alt={show.name}
                 className="poster-image"
               />
             </div>
@@ -307,11 +314,11 @@ const TVDetail = () => {
                   <div className="cast-grid">
                     {show.credits.cast.slice(0, 20).map((castMember) => (
                       <OverlayTrigger
-                        key={castMember.id}
+                        key={castMember.credit_id}
                         placement="top"
                         overlay={
                           castMember.character ? (
-                            <Tooltip id={`tooltip-${castMember.id}`}>
+                            <Tooltip id={`tooltip-${castMember.credit_id}`}>
                               {castMember.character}
                             </Tooltip>
                           ) : (

@@ -1,27 +1,26 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { tmdb } from '../../services/tmdb';
+import ErrorState from '../../components/ErrorState';
 import '../../styles/EpisodeDetail.scss';
 
 const EpisodeDetail = () => {
   const { tvId, seasonNumber, episodeNumber } = useParams();
   const navigate = useNavigate();
   const [episode, setEpisode] = useState(null);
+  const [error, setError] = useState(false);
   const [showInfo, setShowInfo] = useState(null);
   const [episodeCast, setEpisodeCast] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const apiKey = process.env.REACT_APP_API_KEY;
-        const episodeEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`;
-        const showEndpoint = `https://api.themoviedb.org/3/tv/${tvId}`;
-        const creditsEndpoint = `https://api.themoviedb.org/3/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}/credits`;
+        const episodePath = `/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`;
 
         const [episodeRes, showRes, creditsRes] = await Promise.all([
-          axios.get(episodeEndpoint, { params: { api_key: apiKey } }),
-          axios.get(showEndpoint, { params: { api_key: apiKey } }),
-          axios.get(creditsEndpoint, { params: { api_key: apiKey } }),
+          tmdb.get(episodePath),
+          tmdb.get(`/tv/${tvId}`),
+          tmdb.get(`${episodePath}/credits`),
         ]);
 
         setEpisode(episodeRes.data);
@@ -30,6 +29,7 @@ const EpisodeDetail = () => {
         document.title = `${episodeRes.data.name} - ${showRes.data.name}`;
       } catch (error) {
         console.error('Error fetching episode details', error);
+        setError(true);
       }
     }
 
@@ -55,6 +55,10 @@ const EpisodeDetail = () => {
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
+
+  if (error) {
+    return <ErrorState message="We couldn't load this episode." />;
+  }
 
   if (!episode || !showInfo) {
     return (
