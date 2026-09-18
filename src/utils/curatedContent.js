@@ -21,17 +21,31 @@ const ANTICIPATED_POOL = [
 // unreleased (e.g. the pool has gone stale and needs new IDs added).
 const ANTICIPATED_FALLBACK = [687163, 1170608, 1368337];
 
+// Candidate pool for the seasonal "Spooky Season" list — four are picked at
+// random on each load. Keep this at module scope: CuratedPicks refetches (and
+// reshuffles) whenever this array's identity changes, so an inline literal
+// would reshuffle the picks on every re-render of Home.
+const HALLOWEEN_POOL = [
+  948, // Halloween (1978)
+  1008042, // Talk to Me (2023)
+  805, // Rosemary's Baby (1968)
+  694, // The Shining (1980)
+  575776, // Saint Maud (2020)
+];
+
 export const getCuratedContent = () => {
   const now = new Date();
   const month = now.getMonth(); // 0-11
   const day = now.getDate();
 
   // Halloween (October 1 - November 10)
-  if (month === 9 || (month === 10 && day <= 10)) {
+  if (month === 8 || (month === 10 && day <= 10)) {
     return {
-      movieIds: [575776, 913290, 1008042],
+      movieIds: HALLOWEEN_POOL,
+      pickCount: 4,
       title: 'Spooky Season Picks',
-      description: 'Get in the Halloween spirit with these chilling favorites.',
+      description:
+        'Chilling picks for the spooky season - some fresh, some you already know by heart.',
     };
   }
 

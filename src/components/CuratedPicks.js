@@ -11,6 +11,7 @@ const CuratedPicks = ({
   description,
   fallbackDescription,
   movieIds,
+  pickCount,
   moviePool,
   fallbackMovieIds,
   theme = 'dark',
@@ -34,11 +35,14 @@ const CuratedPicks = ({
       return responses.map((res) => res.data);
     };
 
-    // Static picks (e.g. seasonal lists): show exactly the given IDs.
+    // Static picks (e.g. seasonal lists): show the given IDs in order, or a
+    // random `pickCount` of them. Randomizing before the fetch keeps the
+    // request count at `pickCount` no matter how large the pool grows.
     const fetchStaticPicks = async () => {
       try {
         setUsingFallback(false);
-        setMovies(await fetchMoviesByIds(movieIds));
+        const ids = pickCount ? pickRandom(movieIds, pickCount) : movieIds;
+        setMovies(await fetchMoviesByIds(ids));
       } catch (error) {
         console.error('Error fetching curated movies:', error);
       } finally {
@@ -76,7 +80,7 @@ const CuratedPicks = ({
     } else if (movieIds?.length) {
       fetchStaticPicks();
     }
-  }, [movieIds, moviePool, fallbackMovieIds]);
+  }, [movieIds, pickCount, moviePool, fallbackMovieIds]);
 
   const getReleaseYear = (date) => (date ? date.split('-')[0] : 'TBD');
 
