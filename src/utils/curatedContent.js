@@ -43,9 +43,12 @@ export const getCuratedContent = () => {
     return {
       movieIds: HALLOWEEN_POOL,
       pickCount: 4,
-      title: 'Spooky Season Picks',
+      theme: 'halloween',
+      badgeLabel: "Editor's Picks",
+      badgeIcon: 'moon',
+      title: 'Spooky Season',
       description:
-        'Chilling picks for the spooky season - some fresh, some you already know by heart.',
+        'Chilling picks - some fresh, some you already know by heart.',
     };
   }
 

@@ -6,6 +6,11 @@ import { getUsReleaseInfo } from '../utils/releaseInfo';
 import { pickRandom } from '../utils/random';
 import '../styles/CuratedPicks.scss';
 
+const BADGE_ICONS = {
+  star: 'M10 1L12.39 6.26L18 7.27L14 11.14L15.18 17L10 14.27L4.82 17L6 11.14L2 7.27L7.61 6.26L10 1Z',
+  moon: 'M17.5 10.66A7.5 7.5 0 1 1 9.34 2.5 5.83 5.83 0 0 0 17.5 10.66z',
+};
+
 const CuratedPicks = ({
   title,
   description,
@@ -14,6 +19,8 @@ const CuratedPicks = ({
   pickCount,
   moviePool,
   fallbackMovieIds,
+  badgeLabel = "Editor's Pick",
+  badgeIcon = 'star',
   theme = 'dark',
 }) => {
   const [movies, setMovies] = useState([]);
@@ -94,11 +101,11 @@ const CuratedPicks = ({
             <span className="header-badge">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path
-                  d="M10 1L12.39 6.26L18 7.27L14 11.14L15.18 17L10 14.27L4.82 17L6 11.14L2 7.27L7.61 6.26L10 1Z"
+                  d={BADGE_ICONS[badgeIcon] ?? BADGE_ICONS.star}
                   fill="currentColor"
                 />
               </svg>
-              Editor's Pick
+              {badgeLabel}
             </span>
             <h2 className="curated-title">{title}</h2>
             <p className="curated-description">

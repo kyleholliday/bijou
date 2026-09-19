@@ -70,7 +70,7 @@ const Home = () => {
     <div className="home-page">
       <Backdrop />
 
-      <CuratedPicks {...curatedContent} theme="dark" />
+      <CuratedPicks {...curatedContent} />
 
       <div className="home-content">
         {nowPlaying.length > 0 && (
